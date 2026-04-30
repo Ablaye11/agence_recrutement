@@ -4,6 +4,7 @@
 {% block page_title %}Radar Financier (Impayés){% endblock %}
 
 {% block content %}
+<div hx-get="{% url 'unpaid_commissions' %}" hx-trigger="every 30s" hx-target="#main-content" hx-select="#main-content">
 <div class="stats-grid" style="margin-bottom: 2rem;">
     <div class="card" style="border-left: 5px solid var(--danger);">
         <div class="card-title">Total des Impayés</div>
@@ -42,5 +43,6 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 {% endblock %}

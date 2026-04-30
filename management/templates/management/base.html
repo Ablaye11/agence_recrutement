@@ -12,7 +12,8 @@
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     {% block extra_head %}{% endblock %}
 </head>
-<body hx-boost="true">
+<body hx-boost="true" hx-indicator=".htmx-progress">
+    <div class="htmx-progress"></div>
     {% if user.is_authenticated %}
     <!-- Bouton Mobile -->
     <div class="mobile-header" style="display: none; background: #1e293b; color: white; padding: 1rem; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000;">

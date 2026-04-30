@@ -19,9 +19,30 @@
     box-sizing: border-box;
 }
 
-html, body {
-    max-width: 100vw;
-    overflow-x: hidden;
+/* HTMX Indicator */
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: block;
+}
+.htmx-request.htmx-indicator {
+    display: block;
+}
+
+/* Barre de chargement en haut */
+.htmx-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: var(--success);
+    z-index: 2000;
+    transition: width 0.3s ease;
+}
+.htmx-request .htmx-progress {
+    width: 100%;
 }
 
 body {
