@@ -33,17 +33,14 @@ from django.db.models import Count, Sum
 
 @login_required
 def statistics(request):
-    # Répartition par poste
     stats_poste = Candidat.objects.values('poste_recherche').annotate(total=Count('id'))
     labels_poste = [str(dict(Candidat.POSTE_CHOICES).get(s['poste_recherche'], s['poste_recherche'])) for s in stats_poste]
     data_poste = [s['total'] for s in stats_poste]
 
-    # Répartition par statut
     stats_statut = Candidat.objects.values('statut').annotate(total=Count('id'))
     labels_statut = [str(dict(Candidat.STATUT_CHOICES).get(s['statut'], s['statut'])) for s in stats_statut]
     data_statut = [s['total'] for s in stats_statut]
 
-    # Évolution des inscriptions (6 derniers mois)
     from django.db.models.functions import TruncMonth
     import datetime
     six_months_ago = datetime.date.today() - datetime.timedelta(days=180)
@@ -72,11 +69,8 @@ def dashboard(request):
     total_places = Candidat.objects.filter(statut='PLACED').count()
     total_dispo = Candidat.objects.filter(statut='AVAILABLE').count()
     total_attente = Candidat.objects.filter(statut='WAITING').count()
-    
-    # Calcul des revenus (somme des commissions payées)
     total_revenus = Placement.objects.filter(est_paye=True).aggregate(Sum('commission'))['commission__sum'] or 0
 
-    # Données pour Chart.js (Répartition par poste)
     postes_stats = Candidat.objects.values('poste_recherche').annotate(total=Count('poste_recherche'))
     labels_poste = [p['poste_recherche'] for p in postes_stats]
     data_poste = [p['total'] for p in postes_stats]
@@ -100,23 +94,15 @@ def candidat_list(request):
     statut = request.GET.get('statut')
     poste = request.GET.get('poste')
     adresse_query = request.GET.get('adresse')
-    
     candidats = Candidat.objects.all()
-    
     if query:
-        candidats = candidats.filter(
-            Q(nom__icontains=query) | 
-            Q(prenom__icontains=query) | 
-            Q(telephone__icontains=query) |
-            Q(adresse__icontains=query)
-        )
+        candidats = candidats.filter(Q(nom__icontains=query) | Q(prenom__icontains=query) | Q(telephone__icontains=query) | Q(adresse__icontains=query))
     if adresse_query:
         candidats = candidats.filter(adresse__icontains=adresse_query)
     if statut:
         candidats = candidats.filter(statut=statut)
     if poste:
         candidats = candidats.filter(poste_recherche=poste)
-        
     return render(request, 'management/candidat_list.html', {'candidats': candidats})
 
 @login_required
@@ -160,12 +146,10 @@ def placement_create(request):
     initial_data = {}
     if candidat_id:
         initial_data['candidat'] = candidat_id
-        
     if request.method == 'POST':
         form = PlacementForm(request.POST)
         if form.is_valid():
             placement = form.save()
-            # Mettre à jour le statut du candidat
             candidat = placement.candidat
             candidat.statut = 'PLACED'
             candidat.save()
@@ -194,23 +178,19 @@ def placement_edit(request, pk):
             return redirect('placement_list')
     else:
         form = PlacementForm(instance=placement)
-    return render(request, 'management/placement_form.html', {'form': form, 'title': 'Modifier le placement'})
+    return render(request, 'management/placement_form.html', {'form': form})
 
 @login_required
 def placement_terminate(request, pk):
     placement = get_object_or_404(Placement, pk=pk)
     if placement.statut_emploi == 'ACTIVE':
-        # Marquer le contrat comme terminé
         placement.statut_emploi = 'TERMINATED'
         import datetime
         placement.date_fin = datetime.date.today()
         placement.save()
-        
-        # Libérer le candidat
         candidat = placement.candidat
         candidat.statut = 'AVAILABLE'
         candidat.save()
-        
     return redirect('placement_list')
 
 @login_required
@@ -245,25 +225,11 @@ def client_create(request):
 def finance_reports(request):
     from django.db.models.functions import ExtractMonth
     import json
-    
-    # Revenus par mois
-    revenus_qs = Placement.objects.filter(est_paye=True).annotate(
-        month=ExtractMonth('date_paiement')
-    ).values('month').annotate(total=Sum('commission')).order_by('month')
-    
-    # Préparation des données pour JS
+    revenus_qs = Placement.objects.filter(est_paye=True).annotate(month=ExtractMonth('date_paiement')).values('month').annotate(total=Sum('commission')).order_by('month')
     labels = [f"Mois {r['month']}" for r in revenus_qs]
     data = [float(r['total']) for r in revenus_qs]
-    
-    # Meilleurs clients
     top_clients = Client.objects.annotate(num_placements=Count('placements')).order_by('-num_placements')[:5]
-    
-    return render(request, 'management/reports.html', {
-        'revenus_mensuels': revenus_qs,
-        'top_clients': top_clients,
-        'js_labels': json.dumps(labels),
-        'js_data': json.dumps(data),
-    })
+    return render(request, 'management/reports.html', {'revenus_mensuels': revenus_qs, 'top_clients': top_clients, 'js_labels': json.dumps(labels), 'js_data': json.dumps(data)})
 
 @login_required
 def candidat_print(request, pk):
@@ -278,9 +244,7 @@ def placement_print(request, pk):
 @login_required
 def pending_validation_count(request):
     count = Candidat.objects.filter(statut='WAITING').count()
-    if count > 0:
-        return render(request, 'management/partials/pending_badge.html', {'count': count})
-    return render(request, 'management/partials/pending_badge.html', {'count': 0})
+    return render(request, 'management/partials/pending_badge.html', {'count': count})
 
 @login_required
 def candidat_approve(request, pk):
@@ -302,5 +266,10 @@ def candidat_public_register(request):
         form = CandidatForm()
         if 'statut' in form.fields: del form.fields['statut']
         if 'observations' in form.fields: del form.fields['observations']
-        
     return render(request, 'management/public_register.html', {'form': form})
+
+@login_required
+def unpaid_commissions(request):
+    unpaid = Placement.objects.filter(est_paye=False).order_by('-date_placement')
+    total_due = unpaid.aggregate(Sum('commission'))['commission__sum'] or 0
+    return render(request, 'management/unpaid_commissions.html', {'unpaid': unpaid, 'total_due': total_due})

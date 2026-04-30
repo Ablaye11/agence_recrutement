@@ -1,0 +1,46 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Commissions en attente - Agence Pro{% endblock %}
+{% block page_title %}Radar Financier (Impayés){% endblock %}
+
+{% block content %}
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    <div class="card" style="border-left: 5px solid var(--danger);">
+        <div class="card-title">Total des Impayés</div>
+        <div class="card-value" style="color: var(--danger);">{{ total_due }} FCFA</div>
+    </div>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Date Placement</th>
+                <th>Candidat</th>
+                <th>Client</th>
+                <th>Commission Due</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in unpaid %}
+            <tr>
+                <td>{{ p.date_placement|date:"d/m/Y" }}</td>
+                <td><strong>{{ p.candidat.nom }} {{ p.candidat.prenom }}</strong></td>
+                <td>{{ p.client.nom }}</td>
+                <td style="color: var(--danger); font-weight: 700;">{{ p.commission }} FCFA</td>
+                <td>
+                    <a href="{% url 'placement_edit' p.pk %}" class="btn" style="background: var(--primary-color); color: #fff; text-decoration: none; font-size: 0.8rem; padding: 5px 15px;">Marquer comme payé</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 3rem; color: var(--success); font-weight: 600;">
+                    ✅ Toutes les commissions ont été réglées !
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

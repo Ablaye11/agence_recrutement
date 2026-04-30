@@ -25,7 +25,8 @@ class Candidat(models.Model):
 
     matricule = models.CharField(max_length=20, unique=True, editable=False)
     photo = models.ImageField(upload_to='candidats/', null=True, blank=True)
-    piece_identite = models.FileField(upload_to='documents/', null=True, blank=True, verbose_name="Pièce d'identité (Scan/Photo)")
+    piece_identite = models.FileField(upload_to='documents/cni/', null=True, blank=True, verbose_name="Carte d'Identité (PDF/Image)")
+    certificat_medical = models.FileField(upload_to='documents/sante/', null=True, blank=True, verbose_name="Certificat Médical")
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
     age = models.PositiveIntegerField()

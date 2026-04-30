@@ -4,8 +4,11 @@ from .models import Candidat, Client, Placement
 class CandidatForm(forms.ModelForm):
     class Meta:
         model = Candidat
-        fields = ['photo', 'piece_identite', 'nom', 'prenom', 'age', 'telephone', 'adresse', 'poste_recherche', 'experience', 'disponibilite', 'statut', 'observations']
+        fields = ['photo', 'piece_identite', 'certificat_medical', 'nom', 'prenom', 'age', 'telephone', 'adresse', 'poste_recherche', 'experience', 'disponibilite', 'statut', 'observations']
         widgets = {
+            'photo': forms.FileInput(attrs={'class': 'form-control'}),
+            'piece_identite': forms.FileInput(attrs={'class': 'form-control'}),
+            'certificat_medical': forms.FileInput(attrs={'class': 'form-control'}),
             'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom de famille'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms'}),
             'age': forms.NumberInput(attrs={'class': 'form-control'}),

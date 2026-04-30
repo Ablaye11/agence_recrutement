@@ -27,4 +27,5 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('logout-success/', views.logout_success_view, name='logout_success'),
+    path('finance/impayes/', views.unpaid_commissions, name='unpaid_commissions'),
 ]

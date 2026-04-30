@@ -14,7 +14,13 @@
 </head>
 <body hx-boost="true">
     {% if user.is_authenticated %}
-    <nav class="sidebar">
+    <!-- Bouton Mobile -->
+    <div class="mobile-header" style="display: none; background: #1e293b; color: white; padding: 1rem; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000;">
+        <div style="font-weight: 800; letter-spacing: 1px;">AGENCE PRO</div>
+        <button id="menu-toggle" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">☰</button>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-logo">AGENCE PRO</div>
         <ul class="nav-links">
             <li class="nav-item">
@@ -64,6 +70,11 @@
                     Rapports Financiers
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{% url 'unpaid_commissions' %}" class="nav-link {% if request.resolver_match.url_name == 'unpaid_commissions' %}active{% endif %}" style="color: #fda4af;">
+                    ⚠️ Commissions Impayées
+                </a>
+            </li>
             <li class="nav-item" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
                 <a href="{% url 'public_register' %}" target="_blank" class="nav-link" style="color: var(--success); font-weight: 700;">
                     📢 Portail Inscription
@@ -106,5 +117,25 @@
         });
     </script>
     {% block extra_js %}{% endblock %}
+    <script>
+        // Toggle Sidebar Mobile
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        // Fermer le menu si on clique sur un lien (sur mobile)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
