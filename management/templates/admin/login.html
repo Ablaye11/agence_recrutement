@@ -1,0 +1,52 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/admin_custom.css' %}">
+    <style>
+        body.login { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important; }
+        #container { background: transparent !important; border: none !important; }
+        #content { padding: 0 !important; width: 100% !important; }
+        .login #header { display: none; }
+        .login #content-main { 
+            background: #fff; 
+            padding: 2.5rem; 
+            border-radius: 1.5rem; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        .login .form-row { border: none !important; padding: 10px 0 !important; }
+        .login label { font-weight: 600; color: #1e293b; }
+        .submit-row { background: transparent !important; padding: 20px 0 0 0 !important; }
+        .submit-row input { 
+            width: 100% !important; 
+            float: none !important; 
+            background: #2563eb !important; 
+            height: 45px !important;
+            font-size: 1rem !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #1e293b; font-weight: 800;">ADMIN AGENCE PRO</h2>
+    <form action="{{ app_path }}" method="post" id="login-form">
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form.username.errors }}
+            {{ form.username.label_tag }} {{ form.username }}
+        </div>
+        <div class="form-row">
+            {{ form.password.errors }}
+            {{ form.password.label_tag }} {{ form.password }}
+            <input type="hidden" name="next" value="{{ next }}">
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="{% translate 'Log in' %}">
+        </div>
+    </form>
+</div>
+{% endblock %}

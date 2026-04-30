@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription Réussie - AGENCE PRO</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .success-card { text-align: center; max-width: 500px; padding: 40px; background: #fff; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .icon { font-size: 60px; color: #10b981; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="success-card">
+        <div class="icon">✓</div>
+        <h1 style="color: #1e293b; margin-bottom: 10px;">Inscription Réussie !</h1>
+        <p style="color: #64748b; line-height: 1.6;">Merci pour votre inscription. Votre dossier a été transmis à nos services. Nous vous contacterons très prochainement pour un entretien.</p>
+        <a href="{% url 'public_register' %}" style="display: inline-block; margin-top: 30px; color: #2563eb; text-decoration: none; font-weight: 600;">Retour à l'accueil</a>
+    </div>
+</body>
+</html>

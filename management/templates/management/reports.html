@@ -1,0 +1,78 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Rapports Financiers - Agence Pro{% endblock %}
+{% block page_title %}Analyses et Revenus{% endblock %}
+
+{% block content %}
+<div class="chart-container" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+    <div class="card">
+        <div class="card-title">Évolution des Revenus Mensuels (FCFA)</div>
+        <canvas id="revenueChart" height="200"></canvas>
+    </div>
+    
+    <div class="card">
+        <div class="card-title">Top 5 Clients</div>
+        <ul style="list-style: none; margin-top: 1rem;">
+            {% for client in top_clients %}
+            <li style="padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
+                <span style="font-weight: 600;">{{ client.nom }}</span>
+                <span class="badge badge-placed">{{ client.num_placements }} placement(s)</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <div class="card-title">Détails des Commissions Encaissées</div>
+    <div class="table-container" style="box-shadow: none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Mois (Numéro)</th>
+                    <th>Total Commissions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in revenus_mensuels %}
+                <tr>
+                    <td>Mois {{ r.month }}</td>
+                    <td style="font-weight: 700; color: var(--success);">{{ r.total }} FCFA</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" style="text-align: center; padding: 2rem;">Aucun revenu enregistré.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const revenueData = {
+        labels: {{ js_labels|safe }},
+        datasets: [{
+            label: 'Revenus (FCFA)',
+            data: {{ js_data|safe }},
+            borderColor: '#2563eb',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            fill: true,
+            tension: 0.4
+        }]
+    };
+
+    new Chart(ctx, {
+        type: 'line',
+        data: revenueData,
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+{% endblock %}

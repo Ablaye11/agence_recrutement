@@ -1,0 +1,47 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Validations en attente - Agence Pro{% endblock %}
+{% block page_title %}Dossiers à Valider{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-title">Nouveaux dossiers reçus via le portail public</div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Matricule</th>
+                    <th>Nom & Prénom</th>
+                    <th>Poste</th>
+                    <th>Adresse</th>
+                    <th>Date d'envoi</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in candidats %}
+                <tr>
+                    <td>{{ c.matricule }}</td>
+                    <td><span style="font-weight: 600;">{{ c.nom }} {{ c.prenom }}</span></td>
+                    <td>{{ c.get_poste_recherche_display }}</td>
+                    <td>{{ c.adresse }}</td>
+                    <td>{{ c.date_inscription|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'candidat_detail' c.pk %}" class="badge badge-placed" style="text-decoration: none; color: white;">Examiner</a>
+                            <a href="{% url 'candidat_approve' c.pk %}" class="badge badge-available" style="text-decoration: none; color: white; background: var(--success);">Approuver</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        🎉 Félicitations ! Aucun dossier en attente de validation.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

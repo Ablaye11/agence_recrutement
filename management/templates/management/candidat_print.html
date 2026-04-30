@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>CV - {{ candidat.nom }} {{ candidat.prenom }}</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #1e293b; padding: 40px; }
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #2563eb; padding-bottom: 20px; }
+        .logo { font-size: 24px; font-weight: 800; color: #2563eb; }
+        .cv-title { font-size: 32px; font-weight: 700; margin: 30px 0; }
+        .grid { display: grid; grid-template-columns: 200px 1fr; gap: 40px; }
+        .photo { width: 200px; height: 200px; border-radius: 12px; object-fit: cover; border: 1px solid #e2e8f0; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 18px; font-weight: 700; color: #2563eb; text-transform: uppercase; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+        .info-row { margin-bottom: 10px; }
+        .label { font-weight: 600; color: #64748b; width: 150px; display: inline-block; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer;">Imprimer cette fiche</button>
+    </div>
+
+    <div class="header">
+        <div class="logo">AGENCE PRO</div>
+        <div>Matricule: {{ candidat.matricule }}</div>
+    </div>
+
+    <h1 class="cv-title">{{ candidat.prenom }} {{ candidat.nom }}</h1>
+
+    <div class="grid">
+        <div>
+            {% if candidat.photo %}
+            <img src="{{ candidat.photo.url }}" class="photo">
+            {% else %}
+            <div style="width: 200px; height: 200px; background: #f1f5f9; border-radius: 12px;"></div>
+            {% endif %}
+        </div>
+        <div>
+            <div class="section">
+                <div class="section-title">Informations Personnelles</div>
+                <div class="info-row"><span class="label">Âge:</span> {{ candidat.age }} ans</div>
+                <div class="info-row"><span class="label">Téléphone:</span> {{ candidat.telephone }}</div>
+                <div class="info-row"><span class="label">Adresse:</span> {{ candidat.adresse }}</div>
+                <div class="info-row"><span class="label">Poste:</span> {{ candidat.get_poste_recherche_display }}</div>
+                <div class="info-row"><span class="label">Disponibilité:</span> {{ candidat.get_disponibilite_display }}</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Expérience Professionnelle</div>
+                <p style="line-height: 1.6;">{{ candidat.experience|linebreaksbr }}</p>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Observations Agence</div>
+                <p style="line-height: 1.6; font-style: italic;">{{ candidat.observations|linebreaksbr }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px; font-size: 12px; color: #94a3b8; text-align: center;">
+        Document généré par le Système de Gestion AGENCE PRO - © 2026
+    </div>
+</body>
+</html>

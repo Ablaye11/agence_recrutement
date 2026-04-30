@@ -1,0 +1,56 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Historique des Placements - Agence Pro{% endblock %}
+{% block page_title %}Historique des Placements{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Candidat</th>
+                <th>Client</th>
+                <th>Période</th>
+                <th>Dernier Salaire</th>
+                <th>Statut Paiement</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in history %}
+            <tr>
+                <td><strong>{{ p.candidat.nom }} {{ p.candidat.prenom }}</strong></td>
+                <td>{{ p.client.nom }}</td>
+                <td>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">
+                        Du {{ p.date_debut|date:"d/m/Y" }}<br>
+                        au {{ p.date_fin|date:"d/m/Y" }}
+                    </span>
+                </td>
+                <td>{{ p.salaire }} FCFA</td>
+                <td>
+                    {% if p.est_paye %}
+                    <span class="badge badge-available">Frais Payés</span>
+                    {% else %}
+                    <span class="badge badge-waiting">Non réglé</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'placement_print' p.pk %}" target="_blank" style="color: #475569; font-weight: 600; text-decoration: none;">📄 Revoir Contrat</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                    Aucun historique de placement pour le moment.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'placement_list' %}" class="btn" style="background: var(--text-muted); color: #fff; text-decoration: none;">Retour aux missions en cours</a>
+</div>
+{% endblock %}

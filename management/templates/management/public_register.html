@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S'inscrire à l'Agence - AGENCE PRO</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background: #f8fafc; padding: 20px; }
+        .public-container { max-width: 700px; margin: 40px auto; background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { font-size: 24px; font-weight: 800; color: #2563eb; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 1rem; }
+        .btn-submit { width: 100%; padding: 15px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-submit:hover { background: #1d4ed8; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="public-container">
+        <div class="header">
+            <div class="logo">AGENCE PRO</div>
+            <h1 style="margin-top: 10px; font-size: 1.5rem; color: #1e293b;">Inscription Candidate</h1>
+            <p style="color: #64748b;">Veuillez remplir ce formulaire pour rejoindre notre agence.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                {% for field in form %}
+                <div class="form-group {% if field.name == 'experience' or field.name == 'adresse' %}full-width{% endif %}">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #475569;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <p style="color: #dc2626; font-size: 0.8rem; margin-top: 5px;">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn-submit">Envoyer ma candidature</button>
+        </form>
+    </div>
+</body>
+</html>

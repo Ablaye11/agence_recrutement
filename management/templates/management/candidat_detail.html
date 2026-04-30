@@ -1,0 +1,108 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Détails - {{ candidat.matricule }}{% endblock %}
+{% block page_title %}Profil de {{ candidat.nom }} {{ candidat.prenom }}{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+    <!-- Colonne de gauche : Photo et Statut -->
+    <div class="card" style="text-align: center;">
+        {% if candidat.photo %}
+        <img src="{{ candidat.photo.url }}" style="width: 200px; height: 200px; border-radius: 1rem; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid var(--bg-light);">
+        {% else %}
+        <div style="width: 200px; height: 200px; border-radius: 1rem; background: #e2e8f0; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: var(--text-muted);">
+            {{ candidat.nom|slice:":1" }}
+        </div>
+        {% endif %}
+        
+        <h2 style="margin-bottom: 0.5rem;">{{ candidat.nom }} {{ candidat.prenom }}</h2>
+        <p style="color: var(--text-muted); font-weight: 600; margin-bottom: 1rem;">{{ candidat.matricule }}</p>
+        <span class="badge badge-{{ candidat.statut|lower }}" style="font-size: 1rem; padding: 0.5rem 1.5rem;">
+            {{ candidat.get_statut_display }}
+        </span>
+        
+        <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; text-align: left;">
+            <p style="margin-bottom: 0.75rem;"><strong>Âge :</strong> {{ candidat.age }} ans</p>
+            <p style="margin-bottom: 0.75rem;"><strong>Téléphone :</strong> {{ candidat.telephone }}</p>
+            <p style="margin-bottom: 0.75rem;"><strong>Adresse :</strong> {{ candidat.adresse }}</p>
+        </div>
+    </div>
+
+    <!-- Colonne de droite : Expérience et Observations -->
+    <div>
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Informations Professionnelles</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Poste recherché</p>
+                    <p style="font-weight: 600;">{{ candidat.get_poste_recherche_display }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Disponibilité</p>
+                    <p style="font-weight: 600;">{{ candidat.get_disponibilite_display }}</p>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem;">
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Expérience</p>
+                <div style="background: var(--bg-light); padding: 1rem; border-radius: 0.5rem; line-height: 1.6;">
+                    {{ candidat.experience|linebreaks }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Observations</h3>
+            <div style="background: #fff9db; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid var(--warning); line-height: 1.6;">
+                {% if candidat.observations %}
+                {{ candidat.observations|linebreaks }}
+                {% else %}
+                <p style="color: var(--text-muted); font-style: italic;">Aucune observation pour le moment.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+            {% if candidat.statut == 'WAITING' %}
+            <a href="{% url 'candidat_approve' candidat.pk %}" class="btn" style="background: var(--success); color: #fff; text-decoration: none; font-weight: 700;">✅ Approuver et Activer le profil</a>
+            {% endif %}
+            
+            <a href="{% url 'candidat_edit' candidat.pk %}" class="btn btn-primary" style="text-decoration: none;">Modifier le profil</a>
+            {% if candidat.statut != 'PLACED' %}
+            <a href="{% url 'placement_create' %}?candidat={{ candidat.pk }}" class="btn" style="background: var(--success); color: #fff; text-decoration: none;">Placer ce candidat</a>
+            {% endif %}
+            
+            <a href="javascript:void(0)" 
+               id="delete-btn"
+               data-url="{% url 'candidat_delete' candidat.pk %}"
+               data-name="{{ candidat.nom|escapejs }} {{ candidat.prenom|escapejs }}"
+               style="background: #fee2e2; color: #dc2626; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; margin-left: auto;">
+               Supprimer ce dossier
+            </a>
+            <a href="{% url 'candidat_print' candidat.pk %}" target="_blank" class="btn" style="background: #1e293b; color: #fff; text-decoration: none;">Imprimer CV</a>
+            <a href="{% url 'candidat_list' %}" class="btn" style="background: var(--text-muted); color: #fff; text-decoration: none;">Retour à la liste</a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('delete-btn').addEventListener('click', function() {
+    const url = this.getAttribute('data-url');
+    const name = this.getAttribute('data-name');
+    
+    Swal.fire({
+        title: 'Supprimer ce candidat ?',
+        text: "Vous allez supprimer définitivement le dossier de " + name + ". Cette action est irréversible !",
+        icon: 'error',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Oui, supprimer définitivement',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Candidats - Agence Pro{% endblock %}
+{% block page_title %}Registre des Candidats{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 2rem;">
+    <form method="get" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <input type="text" name="q" class="form-control" placeholder="Recherche globale..." value="{{ request.GET.q }}" style="flex: 2;">
+        <input type="text" name="adresse" class="form-control" placeholder="Quartier / Ville" value="{{ request.GET.adresse }}" style="flex: 1;">
+        
+        <select name="statut" class="form-control" style="flex: 1;">
+            <option value="">Tous les statuts</option>
+            <option value="AVAILABLE" {% if request.GET.statut == 'AVAILABLE' %}selected{% endif %}>Disponible</option>
+            <option value="PLACED" {% if request.GET.statut == 'PLACED' %}selected{% endif %}>Placé</option>
+            <option value="WAITING" {% if request.GET.statut == 'WAITING' %}selected{% endif %}>En attente</option>
+        </select>
+
+        <select name="poste" class="form-control" style="flex: 1;">
+            <option value="">Tous les métiers</option>
+            <option value="FEMME_DE_MENAGE" {% if request.GET.poste == 'FEMME_DE_MENAGE' %}selected{% endif %}>Femme de ménage</option>
+            <option value="NOUNOU" {% if request.GET.poste == 'NOUNOU' %}selected{% endif %}>Nounou</option>
+            <option value="VENDEUSE" {% if request.GET.poste == 'VENDEUSE' %}selected{% endif %}>Vendeuse</option>
+            <option value="CUISINIERE" {% if request.GET.poste == 'CUISINIERE' %}selected{% endif %}>Cuisinière</option>
+        </select>
+        
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+        <a href="{% url 'candidat_list' %}" class="btn" style="background: var(--text-muted); color: #fff; text-decoration: none;">Réinitialiser</a>
+        
+        <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="margin-left: auto; background: var(--success); text-decoration: none;">+ Ajouter un candidat</a>
+    </form>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Matricule</th>
+                <th>Candidat</th>
+                <th>Métier</th>
+                <th>Téléphone</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in candidats %}
+            <tr>
+                <td style="font-weight: 700;">{{ c.matricule }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        {% if c.photo %}
+                        <img src="{{ c.photo.url }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        {% else %}
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
+                            {{ c.nom|slice:":1" }}
+                        </div>
+                        {% endif %}
+                        {{ c.nom }} {{ c.prenom }}
+                    </div>
+                </td>
+                <td>{{ c.get_poste_recherche_display }}</td>
+                <td>{{ c.telephone }}</td>
+                <td><span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span></td>
+                <td>
+                    <a href="{% url 'candidat_detail' c.pk %}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Détails</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                    Aucun candidat ne correspond à votre recherche.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

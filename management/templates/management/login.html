@@ -1,0 +1,32 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Connexion - Agence Pro{% endblock %}
+
+{% block content %}
+<div class="login-body" style="height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 9999;">
+    <div class="login-card">
+        <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--sidebar-bg);">AGENCE PRO</h2>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Accès réservé au personnel interne</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Utilisateur</label>
+                <input type="text" name="username" id="id_username" class="form-control" placeholder="Entrez votre nom d'utilisateur" required>
+            </div>
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label for="id_password">Mot de passe</label>
+                <input type="password" name="password" id="id_password" class="form-control" placeholder="••••••••" required>
+            </div>
+            
+            {% if form.errors %}
+            <p style="color: var(--danger); font-size: 0.875rem; margin-top: 1rem; text-align: center;">
+                Identifiants incorrects. Veuillez réessayer.
+            </p>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Se connecter</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

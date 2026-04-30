@@ -1,0 +1,102 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Placements - Agence Pro{% endblock %}
+{% block page_title %}Suivi des Placements & Paiements{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Candidat</th>
+                <th>Client</th>
+                <th>Lieu de travail</th>
+                <th>Salaire</th>
+                <th>Statut</th>
+                <th>Frais Agence</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in placements %}
+            <tr>
+                <td>
+                    <strong>{{ p.candidat.nom }} {{ p.candidat.prenom }}</strong>
+                    <br><small style="color: var(--text-muted);">{{ p.candidat.matricule }}</small>
+                </td>
+                <td>{{ p.client.nom }}</td>
+                <td>{{ p.lieu_travail }}</td>
+                <td style="font-weight: 600;">{{ p.salaire }} FCFA</td>
+                <td>
+                    {% if p.statut_emploi == 'ACTIVE' %}
+                    <span class="badge badge-placed">En poste</span>
+                    {% else %}
+                    <span class="badge" style="background: #fee2e2; color: #991b1b;">Quitté</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if p.est_paye %}
+                    <span class="badge badge-available">✔ Payé</span>
+                    {% else %}
+                    <span class="badge badge-waiting">❌ En attente</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <a href="{% url 'placement_edit' p.pk %}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Gérer</a>
+                        <a href="{% url 'placement_print' p.pk %}" target="_blank" style="color: #475569; font-weight: 600; text-decoration: none;">📄 Contrat</a>
+                        
+                        {% if p.statut_emploi == 'ACTIVE' %}
+                        <a href="javascript:void(0)" 
+                           class="terminate-btn"
+                           data-url="{% url 'placement_terminate' p.pk %}"
+                           data-name="{{ p.candidat.nom|escapejs }}"
+                           style="background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; text-decoration: none; font-weight: 700;">
+                           Terminer
+                        </a>
+                        {% else %}
+                        <span style="color: var(--text-muted); font-size: 0.75rem;">Terminé le {{ p.date_fin|date:"d/m/Y" }}</span>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                    Aucun placement enregistré pour le moment.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="margin-top: 2rem; text-align: right;">
+    <a href="{% url 'placement_create' %}" class="btn btn-primary" style="text-decoration: none;">+ Enregistrer un placement</a>
+</div>
+
+<script>
+document.querySelectorAll('.terminate-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const url = this.getAttribute('data-url');
+        const name = this.getAttribute('data-name');
+        
+        Swal.fire({
+            title: 'Terminer le contrat ?',
+            text: "La candidate " + name + " sera libérée et redeviendra disponible pour d'autres clients.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, terminer le contrat',
+            cancelButtonText: 'Annuler',
+            borderRadius: '1rem'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

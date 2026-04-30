@@ -1,0 +1,7 @@
+{% if count > 0 %}
+<span id="pending-badge" style="background: var(--warning); color: #000; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: 800;">
+    {{ count }}
+</span>
+{% else %}
+<span id="pending-badge"></span>
+{% endif %}

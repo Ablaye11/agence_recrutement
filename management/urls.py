@@ -1,0 +1,30 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.dashboard, name='dashboard'),
+    path('statistiques/', views.statistics, name='statistics'),
+    path('api/pending-count/', views.pending_validation_count, name='pending_count_api'),
+    path('candidats/', views.candidat_list, name='candidat_list'),
+    path('inscriptions-en-attente/', views.inscriptions_en_attente, name='inscriptions_en_attente'),
+    path('candidat/nouveau/', views.candidat_create, name='candidat_create'),
+    path('candidat/<int:pk>/', views.candidat_detail, name='candidat_detail'),
+    path('candidat/<int:pk>/modifier/', views.candidat_edit, name='candidat_edit'),
+    path('candidat/<int:pk>/supprimer/', views.candidat_delete, name='candidat_delete'),
+    path('candidat/<int:pk>/approuver/', views.candidat_approve, name='candidat_approve'),
+    path('client/<int:pk>/supprimer/', views.client_delete, name='client_delete'),
+    path('placements/', views.placement_list, name='placement_list'),
+    path('placements/historique/', views.placement_history, name='placement_history'),
+    path('placement/nouveau/', views.placement_create, name='placement_create'),
+    path('placement/<int:pk>/modifier/', views.placement_edit, name='placement_edit'),
+    path('placement/<int:pk>/terminer/', views.placement_terminate, name='placement_terminate'),
+    path('clients/', views.client_list, name='client_list'),
+    path('client/nouveau/', views.client_create, name='client_create'),
+    path('rapports/', views.finance_reports, name='finance_reports'),
+    path('candidat/<int:pk>/imprimer/', views.candidat_print, name='candidat_print'),
+    path('placement/<int:pk>/imprimer/', views.placement_print, name='placement_print'),
+    path('inscription-publique/', views.candidat_public_register, name='public_register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('logout-success/', views.logout_success_view, name='logout_success'),
+]

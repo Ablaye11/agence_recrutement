@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contrat de Placement - {{ placement.candidat.nom }}</title>
+    <style>
+        body { font-family: 'Times New Roman', serif; color: #000; padding: 50px; line-height: 1.5; }
+        .header { text-align: center; border-bottom: 2px double #000; padding-bottom: 20px; margin-bottom: 30px; }
+        .title { font-size: 24px; font-weight: bold; text-decoration: underline; margin: 30px 0; text-align: center; }
+        .section { margin-top: 25px; }
+        .section-title { font-weight: bold; text-decoration: underline; }
+        .signatures { margin-top: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+        .sig-box { border: 1px solid #000; height: 150px; padding: 10px; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="margin-bottom: 20px; text-align: center;">
+        <button onclick="window.print()" style="padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">IMPRIMER LE CONTRAT</button>
+    </div>
+
+    <div class="header">
+        <h1 style="margin:0;">AGENCE PRO</h1>
+        <p>Recrutement & Placement de Personnel Qualifié</p>
+        <p>Dakar, Sénégal - Tél: +221 77 000 00 00</p>
+    </div>
+
+    <div class="title">CONTRAT DE PLACEMENT ET DE PRESTATION</div>
+
+    <div class="section">
+        <p>Entre les soussignés :</p>
+        <p>1. **L'AGENCE PRO**, représentée par son Responsable.</p>
+        <p>2. **M./Mme {{ placement.client.nom }}**, résidant à {{ placement.client.adresse }}, ci-après dénommé "Le Client".</p>
+        <p>3. **M./Mme {{ placement.candidat.prenom }} {{ placement.candidat.nom }}**, ci-après dénommé(e) "L'Employé(e)".</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">ARTICLE 1 : OBJET DU CONTRAT</div>
+        <p>Le présent contrat a pour objet le placement de l'Employé(e) auprès du Client pour le poste de **{{ placement.candidat.get_poste_recherche_display }}**.</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">ARTICLE 2 : LIEU ET CONDITIONS</div>
+        <p>Le travail s'effectuera à : **{{ placement.lieu_travail }}**.</p>
+        <p>La date de prise de fonction est fixée au : **{{ placement.date_debut }}**.</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">ARTICLE 3 : RÉMUNÉRATION</div>
+        <p>Le salaire mensuel net convenu est de : **{{ placement.salaire }} FCFA**.</p>
+        <p>Les frais de dossier de l'agence s'élèvent à : **{{ placement.commission }} FCFA**.</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">ARTICLE 4 : ENGAGEMENTS</div>
+        <p>L'agence s'engage à assurer le suivi du placement et à remplacer l'employé(e) en cas de manquement grave durant la période de garantie.</p>
+    </div>
+
+    <div style="margin-top: 40px;">Fait à Dakar, le {{ placement.date_placement|date:"d F Y" }}</div>
+
+    <div class="signatures">
+        <div>
+            <p>Signature du Client (Précédé de "Lu et approuvé")</p>
+            <div class="sig-box"></div>
+        </div>
+        <div>
+            <p>Le Responsable de l'Agence (Cachet et Signature)</p>
+            <div class="sig-box"></div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,103 @@
+{% extends 'management/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Agence Pro{% endblock %}
+{% block page_title %}Vue d'ensemble{% endblock %}
+
+{% block content %}
+<div hx-get="{% url 'dashboard' %}" hx-trigger="every 60s" hx-target="#main-content" hx-select="#main-content" style="width: 100%; overflow-x: hidden;">
+{% if total_attente > 0 %}
+<div class="card" style="border-left: 5px solid var(--warning); margin-bottom: 2rem;">
+    <p style="margin: 0; display: flex; align-items: center; gap: 10px; font-weight: 600;">
+        <span style="font-size: 1.5rem;">🔔</span>
+        Vous avez {{ total_attente }} candidat(s) en attente de validation. 
+        <a href="{% url 'candidat_list' %}?statut=WAITING" style="color: var(--primary-color);">Voir les dossiers</a>
+    </p>
+</div>
+{% endif %}
+
+<div class="stats-grid">
+    <div class="card">
+        <div class="card-title">Total Candidats</div>
+        <div class="card-value">{{ total_candidats }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Placés</div>
+        <div class="card-value" style="color: var(--primary-color);">{{ total_places }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Disponibles</div>
+        <div class="card-value" style="color: var(--success);">{{ total_dispo }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">En attente</div>
+        <div class="card-value" style="color: var(--warning);">{{ total_attente }}</div>
+    </div>
+    <div class="card">
+        <div class="card-title">Revenus (Commissions)</div>
+        <div class="card-value" style="color: var(--success);">{{ total_revenus }} FCFA</div>
+    </div>
+</div>
+
+<div class="chart-container">
+    <div class="card">
+        <div class="card-title">Répartition par Poste</div>
+        <canvas id="posteChart" height="150"></canvas>
+    </div>
+    <div class="card">
+        <div class="card-title">Candidats Récents</div>
+        <ul style="list-style: none; margin-top: 1rem;">
+            {% for c in recent_candidats %}
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+                <span>{{ c.nom }} {{ c.prenom }}</span>
+                <span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span>
+            </li>
+            {% empty %}
+            <li>Aucun candidat inscrit.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <div class="card-title">Derniers Placements</div>
+    <div class="table-container" style="box-shadow: none; border: none; margin-top: 1rem;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Candidat</th>
+                    <th>Client</th>
+                    <th>Date début</th>
+                    <th>Salaire</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in recent_placements %}
+                <tr>
+                    <td>{{ p.candidat.nom }}</td>
+                    <td>{{ p.client.nom }}</td>
+                    <td>{{ p.date_debut }}</td>
+                    <td>{{ p.salaire }} FCFA</td>
+                    <td>
+                        {% if p.statut_emploi == 'ACTIVE' %}
+                        <span class="badge badge-placed">En poste</span>
+                        {% else %}
+                        <span class="badge">Quitté</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 2rem;">Aucun placement enregistré.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
