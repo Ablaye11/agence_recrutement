@@ -18,23 +18,23 @@
 
 <div class="stats-grid">
     <div class="card">
-        <div class="card-title">Total Candidats</div>
+        <div class="card-title">👥 Total Candidats</div>
         <div class="card-value">{{ total_candidats }}</div>
     </div>
     <div class="card">
-        <div class="card-title">Placés</div>
+        <div class="card-title">🤝 Placés</div>
         <div class="card-value" style="color: var(--primary-color);">{{ total_places }}</div>
     </div>
     <div class="card">
-        <div class="card-title">Disponibles</div>
+        <div class="card-title">✅ Disponibles</div>
         <div class="card-value" style="color: var(--success);">{{ total_dispo }}</div>
     </div>
     <div class="card">
-        <div class="card-title">En attente</div>
+        <div class="card-title">⏳ En attente</div>
         <div class="card-value" style="color: var(--warning);">{{ total_attente }}</div>
     </div>
     <div class="card">
-        <div class="card-title">Revenus (Commissions)</div>
+        <div class="card-title">💰 Revenus (Commissions)</div>
         <div class="card-value" style="color: var(--success);">{{ total_revenus }} FCFA</div>
     </div>
 </div>
@@ -48,8 +48,15 @@
         <div class="card-title">Candidats Récents</div>
         <ul style="list-style: none; margin-top: 1rem;">
             {% for c in recent_candidats %}
-            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between;">
-                <span>{{ c.nom }} {{ c.prenom }}</span>
+            <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    {% if c.photo %}
+                        <img src="{{ c.photo.url }}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color);">
+                    {% else %}
+                        <div style="width: 35px; height: 35px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; color: #64748b;">{{ c.nom|slice:":1" }}</div>
+                    {% endif %}
+                    <span>{{ c.nom }} {{ c.prenom }}</span>
+                </div>
                 <span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span>
             </li>
             {% empty %}

@@ -4,6 +4,7 @@
 {% block page_title %}Analyses & Statistiques{% endblock %}
 
 {% block content %}
+<div hx-get="{% url 'statistics' %}" hx-trigger="every 60s" hx-target="#main-content" hx-select="#main-content">
 <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); width: 100%; overflow-x: hidden;">
     <!-- Graphique Evolution -->
     <div class="card" style="grid-column: 1 / -1;">
@@ -28,6 +29,7 @@
             <canvas id="statutChart"></canvas>
         </div>
     </div>
+</div>
 </div>
 
 <script>

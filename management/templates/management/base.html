@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Agence de Recrutement{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -87,7 +87,7 @@
             <a href="/admin/" style="color: #94a3b8; font-size: 0.75rem; text-decoration: none;">Accès Technique (Admin)</a>
         </div>
         {% endif %}
-        <a href="{% url 'logout' %}" class="logout-btn">Déconnexion</a>
+        <a href="{% url 'logout' %}" class="logout-btn" hx-boost="false">Déconnexion</a>
     </nav>
     {% endif %}
 

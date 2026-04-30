@@ -4,10 +4,34 @@ import string
 
 class Candidat(models.Model):
     POSTE_CHOICES = [
-        ('FEMME_DE_MENAGE', 'Femme de ménage'),
-        ('NOUNOU', 'Nounou'),
-        ('VENDEUSE', 'Vendeuse'),
-        ('CUISINIERE', 'Cuisinière'),
+        ('MENAGE', 'Femme de ménage'),
+        ('NOUNOU', 'Nounou garde enfant'),
+        ('CUISINE_PRO', 'Cuisinière professionnel'),
+        ('CUISINE_SEN', 'Cuisinière plat sénégalais'),
+        ('BOY', 'Boy domestique'),
+        ('NET_BUREAU', 'Nettoyage bureau'),
+        ('NET_3J', 'Nettoyage 3 jour dans la semaine'),
+        ('NET_ESCALIER', 'Nettoyage escalier'),
+        ('NET_APPART', 'Nettoyage appartement'),
+        ('NET_CHANTIER', 'Nettoyage fin de chantier'),
+        ('NET_SOIR', 'Nettoyage soir'),
+        ('NET_RESTO', 'Nettoyage restaurant'),
+        ('VENDEUSE', 'Vendeuse Boutique'),
+        ('CAISSIER', 'Caissière (er)'),
+        ('SERVEUR', 'Serveuse (er)'),
+        ('CHAUFFEUR_P', 'Chauffeur particulier'),
+        ('CHAUFFEUR_Y', 'Chauffeur yango'),
+        ('LIVREUR_MOTO', 'Chauffeur livreur moto'),
+        ('GARDIEN', 'Gardiennage jour ou nuit'),
+        ('AIDE_VIE', 'Aide personne âgée'),
+        ('GOUVERNANTE', 'Gouvernante'),
+        ('CUISINE_NET', 'Cuisine et nettoyage appartement'),
+        ('JARDINIER', 'Jardinier'),
+        ('SECRETAIRE', 'Secrétaire'),
+        ('ASSISTANTE', 'Assistante'),
+        ('PLONGE', 'Plongé Restaurant'),
+        ('LINGERE', 'Lingère et repassage'),
+        ('AUTRE', 'Autre.....'),
     ]
 
     DISPO_CHOICES = [

@@ -3,29 +3,141 @@
 {% block title %}Connexion - Agence Pro{% endblock %}
 
 {% block content %}
-<div class="login-body" style="height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 9999;">
-    <div class="login-card">
-        <h2 style="text-align: center; margin-bottom: 1.5rem; color: var(--sidebar-bg);">AGENCE PRO</h2>
-        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Accès réservé au personnel interne</p>
+<style>
+    .login-wrapper {
+        height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        background: radial-gradient(circle at top right, #1e293b, #0f172a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        font-family: 'Outfit', sans-serif;
+    }
+    
+    .blob {
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+        filter: blur(80px);
+        border-radius: 50%;
+        z-index: -1;
+        animation: move 20s infinite alternate;
+    }
+    
+    @keyframes move {
+        from { transform: translate(-10%, -10%); }
+        to { transform: translate(10%, 10%); }
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 3rem;
+        border-radius: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        max-width: 380px;
+        width: 90%;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: white;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    }
+
+    .glass-card h2 { color: #fff; margin-bottom: 0.5rem; font-weight: 800; }
+    .glass-card p { color: #94a3b8; margin-bottom: 2rem; font-size: 0.9rem; }
+
+    .input-group { text-align: left; margin-bottom: 1.25rem; }
+    .input-group label { display: block; color: #cbd5e1; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; }
+    
+    .glass-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.875rem 1rem;
+        border-radius: 0.75rem;
+        color: white;
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.3s;
+    }
+    .glass-input:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .login-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: none;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 1rem;
+        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
+    }
+    .login-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.5);
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="blob"></div>
+    <div class="glass-card">
+        <div class="login-logo">A</div>
+        <h2>Bienvenue</h2>
+        <p>Connectez-vous pour gérer votre agence</p>
         
         <form method="post">
             {% csrf_token %}
-            <div class="form-group">
+            <div class="input-group">
                 <label for="id_username">Utilisateur</label>
-                <input type="text" name="username" id="id_username" class="form-control" placeholder="Entrez votre nom d'utilisateur" required>
+                <input type="text" name="username" id="id_username" class="glass-input" placeholder="Nom d'utilisateur" required>
             </div>
-            <div class="form-group" style="margin-top: 1.5rem;">
+            <div class="input-group">
                 <label for="id_password">Mot de passe</label>
-                <input type="password" name="password" id="id_password" class="form-control" placeholder="••••••••" required>
+                <input type="password" name="password" id="id_password" class="glass-input" placeholder="••••••••" required>
             </div>
             
             {% if form.errors %}
-            <p style="color: var(--danger); font-size: 0.875rem; margin-top: 1rem; text-align: center;">
+            <p style="color: #f87171; font-size: 0.8rem; margin-bottom: 1rem; font-weight: 600;">
                 Identifiants incorrects. Veuillez réessayer.
             </p>
             {% endif %}
             
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">Se connecter</button>
+            <button type="submit" class="login-btn">Se connecter</button>
         </form>
     </div>
 </div>
