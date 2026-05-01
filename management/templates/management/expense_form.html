@@ -1,0 +1,39 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Nouvelle Dépense - Agence Pro{% endblock %}
+{% block page_title %}Enregistrer une Dépense{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+        <div style="margin-bottom: 1.5rem;">
+            <label class="form-label">Titre de la dépense</label>
+            <input type="text" name="titre" class="form-control" placeholder="Ex: Loyer du mois de Mai" required>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <label class="form-label">Catégorie</label>
+            <select name="categorie" class="form-control" required>
+                <option value="LOYER">Loyer</option>
+                <option value="SALAIRE">Salaires Staff</option>
+                <option value="INTERNET">Internet & Tel</option>
+                <option value="MARKETING">Publicité</option>
+                <option value="AUTRE">Autre</option>
+            </select>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <label class="form-label">Montant (FCFA)</label>
+            <input type="number" name="montant" class="form-control" placeholder="0" required>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <label class="form-label">Date</label>
+            <input type="date" name="date_depense" class="form-control" value="{{ date_today|date:'Y-m-d' }}">
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1; background: var(--danger);">Enregistrer</button>
+            <a href="{% url 'expense_list' %}" class="btn" style="flex: 1; text-align: center; text-decoration: none; background: #e2e8f0; color: #475569;">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

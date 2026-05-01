@@ -4,80 +4,123 @@
 {% block page_title %}Registre des Candidats{% endblock %}
 
 {% block content %}
-<div class="card" style="margin-bottom: 2rem;">
-    <form method="get" style="display: flex; gap: 1rem; flex-wrap: wrap;">
-        <input type="text" name="q" class="form-control" placeholder="Recherche globale..." value="{{ request.GET.q }}" style="flex: 2;">
-        <input type="text" name="adresse" class="form-control" placeholder="Quartier / Ville" value="{{ request.GET.adresse }}" style="flex: 1;">
-        
-        <select name="statut" class="form-control" style="flex: 1;">
-            <option value="">Tous les statuts</option>
-            <option value="AVAILABLE" {% if request.GET.statut == 'AVAILABLE' %}selected{% endif %}>Disponible</option>
-            <option value="PLACED" {% if request.GET.statut == 'PLACED' %}selected{% endif %}>Placé</option>
-            <option value="WAITING" {% if request.GET.statut == 'WAITING' %}selected{% endif %}>En attente</option>
-        </select>
-
-        <select name="poste" class="form-control" style="flex: 1;">
-            <option value="">Tous les métiers</option>
-            <option value="MENAGE" {% if request.GET.poste == 'MENAGE' %}selected{% endif %}>Femme de ménage</option>
-            <option value="NOUNOU" {% if request.GET.poste == 'NOUNOU' %}selected{% endif %}>Nounou garde enfant</option>
-            <option value="CUISINE_PRO" {% if request.GET.poste == 'CUISINE_PRO' %}selected{% endif %}>Cuisinière professionnel</option>
-            <option value="CHAUFFEUR_Y" {% if request.GET.poste == 'CHAUFFEUR_Y' %}selected{% endif %}>Chauffeur yango</option>
-            <option value="VENDEUSE" {% if request.GET.poste == 'VENDEUSE' %}selected{% endif %}>Vendeuse Boutique</option>
-        </select>
-        
-        <button type="submit" class="btn btn-primary">Filtrer</button>
-        <a href="{% url 'candidat_list' %}" class="btn" style="background: var(--text-muted); color: #fff; text-decoration: none;">Réinitialiser</a>
-        
-        <div style="margin-left: auto; display: flex; gap: 10px;">
-            <a href="{% url 'export_candidats_excel' %}" hx-boost="false" class="btn" style="background: #10b981; color: white; text-decoration: none;">📥 Exporter Excel</a>
-            <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="background: var(--success); text-decoration: none;">+ Ajouter un candidat</a>
+<form id="bulk-form" method="post" action="{% url 'candidat_bulk_action' %}">
+    {% csrf_token %}
+    
+    <div class="card" style="margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="search-input" class="form-control" placeholder="Recherche rapide..." style="flex: 2;">
+            
+            <div style="margin-left: auto; display: flex; gap: 10px;">
+                <a href="{% url 'export_candidats_excel' %}" hx-boost="false" class="btn" style="background: #10b981; color: white; text-decoration: none;">📥 Exporter Excel</a>
+                <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="background: var(--success); text-decoration: none;">+ Ajouter un candidat</a>
+            </div>
         </div>
-    </form>
-</div>
+    </div>
 
-<div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>Matricule</th>
-                <th>Candidat</th>
-                <th>Métier</th>
-                <th>Téléphone</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for c in candidats %}
-            <tr>
-                <td style="font-weight: 700;">{{ c.matricule }}</td>
-                <td>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        {% if c.photo %}
-                        <img src="{{ c.photo.url }}" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color);">
-                        {% else %}
-                        <div style="width: 45px; height: 45px; border-radius: 8px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: var(--text-muted);">
-                            {{ c.nom|slice:":1" }}
+    <!-- Barre d'actions groupées (flottante quand sélectionné) -->
+    <div id="bulk-actions-bar" style="display: none; position: sticky; top: 80px; background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 100; margin-bottom: 1rem; border: 2px solid var(--primary-color); align-items: center; gap: 1.5rem;">
+        <span style="font-weight: 700; color: var(--primary-color);"><span id="selected-count">0</span> candidat(s) sélectionné(s)</span>
+        
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <select name="action" class="form-control" style="width: auto;">
+                <option value="">-- Choisir une action --</option>
+                {% if user.is_superuser %}
+                <option value="delete">Supprimer la sélection</option>
+                {% endif %}
+                <option value="status_available">Passer à 'Disponible'</option>
+                <option value="status_waiting">Passer à 'En attente'</option>
+            </select>
+            <button type="button" onclick="confirmBulkAction()" class="btn btn-primary">Appliquer</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 40px;"><input type="checkbox" id="select-all"></th>
+                    <th>Matricule</th>
+                    <th>Candidat</th>
+                    <th>Métier</th>
+                    <th>Téléphone</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in candidats %}
+                <tr class="candidat-row">
+                    <td><input type="checkbox" name="selected_ids" value="{{ c.pk }}" class="candidat-checkbox"></td>
+                    <td style="font-weight: 700;">{{ c.matricule }}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            {% if c.photo %}
+                            <img src="{{ c.photo.url }}" loading="lazy" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                            {% endif %}
+                            <span style="font-weight: 600;">{{ c.nom }} {{ c.prenom }}</span>
                         </div>
-                        {% endif %}
-                        <span style="font-weight: 600;">{{ c.nom }} {{ c.prenom }}</span>
-                    </div>
-                </td>
-                <td>{{ c.get_poste_recherche_display }}</td>
-                <td>{{ c.telephone }}</td>
-                <td><span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span></td>
-                <td>
-                    <a href="{% url 'candidat_detail' c.pk %}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Détails</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
-                    Aucun candidat ne correspond à votre recherche.
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+                    </td>
+                    <td>{{ c.get_poste_recherche_display }}</td>
+                    <td>{{ c.telephone }}</td>
+                    <td><span class="badge badge-{{ c.statut|lower }}">{{ c.get_statut_display }}</span></td>
+                    <td>
+                        <a href="{% url 'candidat_detail' c.pk %}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Détails</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</form>
+
+<script>
+    // Sélection massive
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.candidat-checkbox');
+    const bulkBar = document.getElementById('bulk-actions-bar');
+    const countSpan = document.getElementById('selected-count');
+
+    function updateBulkBar() {
+        const checked = document.querySelectorAll('.candidat-checkbox:checked');
+        countSpan.innerText = checked.length;
+        bulkBar.style.display = checked.length > 0 ? 'flex' : 'none';
+    }
+
+    selectAll.addEventListener('change', (e) => {
+        checkboxes.forEach(cb => cb.checked = e.target.checked);
+        updateBulkBar();
+    });
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateBulkBar);
+    });
+
+    function confirmBulkAction() {
+        const action = document.querySelector('select[name="action"]').value;
+        if (!action) return;
+
+        Swal.fire({
+            title: 'Êtes-vous sûr ?',
+            text: "Cette action sera appliquée à tous les candidats sélectionnés.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, continuer',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('bulk-form').submit();
+            }
+        });
+    }
+
+    // Recherche instantanée simple
+    document.getElementById('search-input').addEventListener('keyup', function() {
+        const val = this.value.toLowerCase();
+        document.querySelectorAll('.candidat-row').forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(val) ? '' : 'none';
+        });
+    });
+</script>
 {% endblock %}

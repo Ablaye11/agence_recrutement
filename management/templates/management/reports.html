@@ -1,69 +1,74 @@
 {% extends 'management/base.html' %}
 
 {% block title %}Rapports Financiers - Agence Pro{% endblock %}
-{% block page_title %}Analyses et Revenus{% endblock %}
+{% block page_title %}Analyse Financière & Rentabilité{% endblock %}
 
 {% block content %}
-<div hx-get="{% url 'finance_reports' %}" hx-trigger="every 60s" hx-target="#main-content" hx-select="#main-content">
-<div class="chart-container" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+<div class="grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 2rem;">
+    <!-- Revenus -->
+    <div class="card" style="border-top: 4px solid #10b981;">
+        <div style="color: var(--text-muted); font-size: 0.9rem;">Chiffre d'Affaires (Commissions)</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #10b981;">
+            {% for r in revenus %}{% if forloop.last %}{{ r.total }}{% endif %}{% endfor %} FCFA
+        </div>
+    </div>
+    <!-- Dépenses -->
+    <div class="card" style="border-top: 4px solid #ef4444;">
+        <div style="color: var(--text-muted); font-size: 0.9rem;">Total des Dépenses</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #ef4444;">
+            {% for d in depenses %}{% if forloop.last %}{{ d.total }}{% endif %}{% endfor %} FCFA
+        </div>
+    </div>
+    <!-- Bénéfice -->
+    <div class="card" style="border-top: 4px solid #2563eb; background: #f8fafc;">
+        <div style="color: var(--text-muted); font-size: 0.9rem;">Bénéfice Net Estimé</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: #2563eb;">
+            {{ benefice_net|default:"0" }} FCFA
+        </div>
+    </div>
+</div>
+
+<div class="grid" style="grid-template-columns: 2fr 1fr;">
     <div class="card">
-        <div class="card-title">Évolution des Revenus Mensuels (FCFA)</div>
+        <div class="card-title">Évolution des Revenus Mensuels</div>
         <div style="height: 300px;">
             <canvas id="revenueChart"></canvas>
         </div>
     </div>
-    
-    <div class="card">
-        <div class="card-title">Top 5 Clients</div>
-        <ul style="list-style: none; margin-top: 1rem;">
-            {% for client in top_clients %}
-            <li style="padding: 0.75rem 0; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
-                <span style="font-weight: 600;">{{ client.nom }}</span>
-                <span class="badge badge-placed">{{ client.num_placements }} placement(s)</span>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
 
-<div class="card" style="margin-top: 2rem;">
-    <div class="card-title">Détails des Commissions Encaissées</div>
-    <div class="table-container" style="box-shadow: none;">
-        <table>
-            <thead>
-                <tr>
-                    <th>Mois (Numéro)</th>
-                    <th>Total Commissions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for r in revenus_mensuels %}
-                <tr>
-                    <td>Mois {{ r.month }}</td>
-                    <td style="font-weight: 700; color: var(--success);">{{ r.total }} FCFA</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="2" style="text-align: center; padding: 2rem;">Aucun revenu enregistré.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="card">
+        <div class="card-title">Top Clients (Placements)</div>
+        <div class="table-container">
+            <table style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Placements</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in top_clients %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ c.nom }}</td>
+                        <td style="text-align: center;"><span class="badge badge-placed">{{ c.n }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
     (function() {
         setTimeout(() => {
-            const canvas = document.getElementById('revenueChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
+            const ctx = document.getElementById('revenueChart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: {{ js_labels|safe }},
                     datasets: [{
-                        label: 'Revenus (FCFA)',
+                        label: 'Commissions (FCFA)',
                         data: {{ js_data|safe }},
                         borderColor: '#2563eb',
                         backgroundColor: 'rgba(37, 99, 235, 0.1)',
@@ -81,5 +86,4 @@
         }, 50);
     })();
 </script>
-</div>
 {% endblock %}

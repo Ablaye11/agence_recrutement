@@ -22,7 +22,11 @@
         <tbody>
             {% for c in clients %}
             <tr>
-                <td style="font-weight: 700;">{{ c.nom }}</td>
+                <td>
+                    <a href="{% url 'client_detail' c.pk %}" style="color: var(--primary-color); font-weight: 700; text-decoration: none;">
+                        {{ c.nom }}
+                    </a>
+                </td>
                 <td>{{ c.telephone }}</td>
                 <td>{{ c.adresse }}</td>
                 <td>
@@ -30,11 +34,15 @@
                 </td>
                 <td>
                     <div style="display: flex; gap: 0.5rem;">
+                        {% if user.is_superuser %}
                         <a href="javascript:void(0)" 
                            class="delete-client-btn"
                            data-url="{% url 'client_delete' c.pk %}"
                            data-name="{{ c.nom|escapejs }}"
                            style="color: var(--danger); font-weight: 600; text-decoration: none;">Supprimer</a>
+                        {% else %}
+                        <span style="color: #cbd5e1; font-size: 0.8rem;">Verrouillé</span>
+                        {% endif %}
                     </div>
                 </td>
             </tr>

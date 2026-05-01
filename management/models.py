@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 import random
 import string
 
@@ -136,3 +137,25 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.titre
+
+class Expense(models.Model):
+    CATEGORIES = [
+        ('LOYER', 'Loyer'),
+        ('SALAIRE', 'Salaires Staff'),
+        ('INTERNET', 'Internet & Tel'),
+        ('MARKETING', 'Publicité'),
+        ('AUTRE', 'Autre'),
+    ]
+    titre = models.CharField(max_length=200)
+    categorie = models.CharField(max_length=20, choices=CATEGORIES)
+    montant = models.DecimalField(max_digits=10, decimal_places=2)
+    date_depense = models.DateField(default=date.today)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-date_depense']
+        verbose_name = "Dépense"
+        verbose_name_plural = "Dépenses"
+
+    def __str__(self):
+        return f"{self.titre} - {self.montant} FCFA"
