@@ -215,3 +215,16 @@ td {
     .grid, .chart-container { grid-template-columns: 1fr !important; }
     h1 { font-size: 1.25rem; }
 }
+
+/* Notifications */
+.notif-item {
+    padding: 10px;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    border-left: 4px solid #2563eb;
+}
+.notif-item.success { border-left-color: #10b981; }
+.notif-item.warning { border-left-color: #f59e0b; }
+.notif-item.danger { border-left-color: #ef4444; }
+.notif-item.info { border-left-color: #2563eb; }

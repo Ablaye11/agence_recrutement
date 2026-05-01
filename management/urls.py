@@ -28,4 +28,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('logout-success/', views.logout_success_view, name='logout_success'),
     path('finance/impayes/', views.unpaid_commissions, name='unpaid_commissions'),
+    path('export/candidats/', views.export_candidats_excel, name='export_candidats_excel'),
+    path('api/notifications/', views.get_notifications, name='get_notifications'),
+    path('placement/<int:pk>/pdf/', views.generate_contract_pdf, name='generate_contract_pdf'),
 ]

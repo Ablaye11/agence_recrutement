@@ -4,10 +4,13 @@
 {% block page_title %}Analyses et Revenus{% endblock %}
 
 {% block content %}
+<div hx-get="{% url 'finance_reports' %}" hx-trigger="every 60s" hx-target="#main-content" hx-select="#main-content">
 <div class="chart-container" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
     <div class="card">
         <div class="card-title">Évolution des Revenus Mensuels (FCFA)</div>
-        <canvas id="revenueChart" height="200"></canvas>
+        <div style="height: 300px;">
+            <canvas id="revenueChart"></canvas>
+        </div>
     </div>
     
     <div class="card">
@@ -48,31 +51,35 @@
         </table>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    const revenueData = {
-        labels: {{ js_labels|safe }},
-        datasets: [{
-            label: 'Revenus (FCFA)',
-            data: {{ js_data|safe }},
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-            fill: true,
-            tension: 0.4
-        }]
-    };
-
-    new Chart(ctx, {
-        type: 'line',
-        data: revenueData,
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+    (function() {
+        setTimeout(() => {
+            const canvas = document.getElementById('revenueChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ js_labels|safe }},
+                    datasets: [{
+                        label: 'Revenus (FCFA)',
+                        data: {{ js_data|safe }},
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }, 50);
+    })();
 </script>
+</div>
 {% endblock %}

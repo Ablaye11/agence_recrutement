@@ -117,3 +117,22 @@ class Placement(models.Model):
     class Meta:
         verbose_name = "Placement"
         verbose_name_plural = "Placements"
+
+class Notification(models.Model):
+    TYPES = [
+        ('INFO', 'Information'),
+        ('SUCCESS', 'Succès'),
+        ('WARNING', 'Alerte'),
+        ('DANGER', 'Urgent'),
+    ]
+    titre = models.CharField(max_length=200)
+    message = models.TextField()
+    type_notif = models.CharField(max_length=10, choices=TYPES, default='INFO')
+    lu = models.BooleanField(default=False)
+    date_creation = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-date_creation']
+
+    def __str__(self):
+        return self.titre

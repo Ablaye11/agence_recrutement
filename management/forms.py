@@ -45,3 +45,18 @@ class PlacementForm(forms.ModelForm):
             'date_paiement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'statut_emploi': forms.Select(attrs={'class': 'form-control'}),
         }
+
+class RegistrationForm(forms.ModelForm):
+    class Meta:
+        model = Candidat
+        fields = ['nom', 'prenom', 'age', 'telephone', 'adresse', 'poste_recherche', 'experience', 'disponibilite']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom'}),
+            'prenom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénom'}),
+            'age': forms.NumberInput(attrs={'class': 'form-control'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
+            'poste_recherche': forms.Select(attrs={'class': 'form-control'}),
+            'experience': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'disponibilite': forms.Select(attrs={'class': 'form-control'}),
+        }

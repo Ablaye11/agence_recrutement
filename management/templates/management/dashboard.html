@@ -42,7 +42,9 @@
 <div class="chart-container">
     <div class="card">
         <div class="card-title">Répartition par Poste</div>
-        <canvas id="posteChart" height="150"></canvas>
+        <div style="height: 200px;">
+            <canvas id="posteChart"></canvas>
+        </div>
     </div>
     <div class="card">
         <div class="card-title">Candidats Récents</div>
@@ -103,6 +105,31 @@
         </table>
     </div>
 </div>
+<script>
+    (function() {
+        setTimeout(() => {
+            const ctx = document.getElementById('posteChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ labels_poste|safe }},
+                        datasets: [{
+                            data: {{ data_poste|safe }},
+                            backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' }, cutout: '70%' }
+                    }
+                });
+            }
+        }, 50);
+    })();
+</script>
 </div>
 {% endblock %}
 

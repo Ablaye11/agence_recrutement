@@ -44,7 +44,7 @@
                 <td>
                     <div style="display: flex; gap: 0.5rem; align-items: center;">
                         <a href="{% url 'placement_edit' p.pk %}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Gérer</a>
-                        <a href="{% url 'placement_print' p.pk %}" target="_blank" style="color: #475569; font-weight: 600; text-decoration: none;">📄 Contrat</a>
+                        <a href="{% url 'generate_contract_pdf' p.pk %}" hx-boost="false" class="btn" style="background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; padding: 4px 10px; font-size: 0.8rem; text-decoration: none; border-radius: 6px;">📥 Contrat PDF</a>
                         
                         {% if p.statut_emploi == 'ACTIVE' %}
                         <a href="javascript:void(0)" 

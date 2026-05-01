@@ -18,16 +18,20 @@
 
         <select name="poste" class="form-control" style="flex: 1;">
             <option value="">Tous les métiers</option>
-            <option value="FEMME_DE_MENAGE" {% if request.GET.poste == 'FEMME_DE_MENAGE' %}selected{% endif %}>Femme de ménage</option>
-            <option value="NOUNOU" {% if request.GET.poste == 'NOUNOU' %}selected{% endif %}>Nounou</option>
-            <option value="VENDEUSE" {% if request.GET.poste == 'VENDEUSE' %}selected{% endif %}>Vendeuse</option>
-            <option value="CUISINIERE" {% if request.GET.poste == 'CUISINIERE' %}selected{% endif %}>Cuisinière</option>
+            <option value="MENAGE" {% if request.GET.poste == 'MENAGE' %}selected{% endif %}>Femme de ménage</option>
+            <option value="NOUNOU" {% if request.GET.poste == 'NOUNOU' %}selected{% endif %}>Nounou garde enfant</option>
+            <option value="CUISINE_PRO" {% if request.GET.poste == 'CUISINE_PRO' %}selected{% endif %}>Cuisinière professionnel</option>
+            <option value="CHAUFFEUR_Y" {% if request.GET.poste == 'CHAUFFEUR_Y' %}selected{% endif %}>Chauffeur yango</option>
+            <option value="VENDEUSE" {% if request.GET.poste == 'VENDEUSE' %}selected{% endif %}>Vendeuse Boutique</option>
         </select>
         
         <button type="submit" class="btn btn-primary">Filtrer</button>
         <a href="{% url 'candidat_list' %}" class="btn" style="background: var(--text-muted); color: #fff; text-decoration: none;">Réinitialiser</a>
         
-        <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="margin-left: auto; background: var(--success); text-decoration: none;">+ Ajouter un candidat</a>
+        <div style="margin-left: auto; display: flex; gap: 10px;">
+            <a href="{% url 'export_candidats_excel' %}" hx-boost="false" class="btn" style="background: #10b981; color: white; text-decoration: none;">📥 Exporter Excel</a>
+            <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="background: var(--success); text-decoration: none;">+ Ajouter un candidat</a>
+        </div>
     </form>
 </div>
 

@@ -95,9 +95,21 @@
         {% if user.is_authenticated %}
         <header>
             <h1>{% block page_title %}Tableau de bord{% endblock %}</h1>
-            <div class="user-info">
-                {{ user.username|capfirst }}
+            <div class="user-info" style="display: flex; align-items: center; gap: 20px;">
+                <div style="position: relative;">
+                    <span id="notif-bell" style="cursor: pointer; font-size: 1.2rem;">🔔</span>
+                    <div id="notif-dropdown" hx-get="{% url 'get_notifications' %}" hx-trigger="click, every 60s" style="display: none; position: absolute; right: 0; top: 100%; width: 280px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; padding: 10px;">
+                        Chargement...
+                    </div>
+                </div>
+                <span>{{ user.username|capfirst }}</span>
             </div>
+            <script>
+                document.getElementById('notif-bell').onclick = function() {
+                    var dd = document.getElementById('notif-dropdown');
+                    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+                };
+            </script>
         </header>
         {% endif %}
         <main class="content">
@@ -107,14 +119,16 @@
     </main>
 
     <script>
-        // Force l'exécution des scripts après un changement de page HTMX
+        // Relance les scripts lors d'un swap HTMX ou d'un chargement initial
         document.body.addEventListener('htmx:afterSwap', function(evt) {
-            const scripts = evt.detail.elt.querySelectorAll('script');
-            for (let script of scripts) {
-                const newScript = document.createElement("script");
-                newScript.text = script.text;
-                script.parentNode.replaceChild(newScript, script);
-            }
+            const target = evt.detail.target;
+            const scripts = target.querySelectorAll('script');
+            scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
         });
     </script>
     {% block extra_js %}{% endblock %}

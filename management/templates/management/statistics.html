@@ -5,7 +5,7 @@
 
 {% block content %}
 <div hx-get="{% url 'statistics' %}" hx-trigger="every 60s" hx-target="#main-content" hx-select="#main-content">
-<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); width: 100%; overflow-x: hidden;">
+<div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); width: 100%; overflow-x: hidden; display: grid; gap: 1.5rem;">
     <!-- Graphique Evolution -->
     <div class="card" style="grid-column: 1 / -1;">
         <div class="card-title">📈 Évolution des Inscriptions</div>
@@ -30,73 +30,85 @@
         </div>
     </div>
 </div>
-</div>
 
 <script>
     (function() {
-        const colors = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
-        
-        // 1. Evolution (Ligne)
-        new Chart(document.getElementById('evoChart'), {
-            type: 'line',
-            data: {
-                labels: {{ labels_evo|safe }},
-                datasets: [{
-                    label: 'Nouvelles Inscriptions',
-                    data: {{ data_evo|safe }},
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 6,
-                    pointBackgroundColor: '#2563eb'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' } },
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        setTimeout(() => {
+            const colors = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
+            
+            // 1. Evolution (Ligne)
+            const ctxEvo = document.getElementById('evoChart');
+            if (ctxEvo) {
+                new Chart(ctxEvo, {
+                    type: 'line',
+                    data: {
+                        labels: {{ labels_evo|safe }},
+                        datasets: [{
+                            label: 'Nouvelles Inscriptions',
+                            data: {{ data_evo|safe }},
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#2563eb'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                    }
+                });
             }
-        });
 
-        // 2. Poste (Barres horizontales)
-        new Chart(document.getElementById('posteChart'), {
-            type: 'bar',
-            data: {
-                labels: {{ labels_poste|safe }},
-                datasets: [{
-                    label: 'Candidats',
-                    data: {{ data_poste|safe }},
-                    backgroundColor: colors,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
+            // 2. Poste (Doughnut)
+            const ctxPoste = document.getElementById('posteChart');
+            if (ctxPoste) {
+                new Chart(ctxPoste, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ labels_poste|safe }},
+                        datasets: [{
+                            data: {{ data_poste|safe }},
+                            backgroundColor: colors,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { 
+                            legend: { position: 'bottom' },
+                            cutout: '70%'
+                        }
+                    }
+                });
             }
-        });
 
-        // 3. Statut (Doughnut)
-        new Chart(document.getElementById('statutChart'), {
-            type: 'doughnut',
-            data: {
-                labels: {{ labels_statut|safe }},
-                datasets: [{
-                    data: {{ data_statut|safe }},
-                    backgroundColor: ['#10b981', '#2563eb', '#f59e0b', '#64748b'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'bottom' }, cutout: '70%' }
+            // 3. Statut (Doughnut)
+            const ctxStatut = document.getElementById('statutChart');
+            if (ctxStatut) {
+                new Chart(ctxStatut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: {{ labels_statut|safe }},
+                        datasets: [{
+                            data: {{ data_statut|safe }},
+                            backgroundColor: ['#10b981', '#2563eb', '#f59e0b', '#64748b'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' }, cutout: '70%' }
+                    }
+                });
             }
-        });
+        }, 50);
     })();
 </script>
+</div>
 {% endblock %}
