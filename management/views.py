@@ -89,7 +89,7 @@ def statistics(request):
 @login_required
 def inscriptions_en_attente(request):
     candidats = Candidat.objects.filter(statut='WAITING').order_by('-date_inscription')
-    return render(request, 'management/candidat_list.html', {'candidats': candidats, 'is_waiting_list': True})
+    return render(request, 'management/inscriptions_en_attente.html', {'candidats': candidats})
 
 @login_required
 def candidat_list(request):
