@@ -373,7 +373,7 @@ def generate_contract_pdf(request, pk):
 
 @login_required
 def unpaid_commissions(request):
-    unpaid = Placement.objects.select_related('candidat', 'client').filter(est_paye=False).order_by('-date_placement')
+    unpaid = Placement.objects.select_related('candidat', 'client').filter(est_paye=False, statut_emploi='ACTIVE').order_by('-date_placement')
     return render(request, 'management/unpaid_commissions.html', {'unpaid': unpaid, 'total_due': unpaid.aggregate(Sum('commission'))['commission__sum'] or 0})
 
 @login_required
