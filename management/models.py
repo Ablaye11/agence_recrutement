@@ -36,7 +36,8 @@ class Candidat(models.Model):
     ]
 
     DISPO_CHOICES = [
-        ('DAILY', 'Tous les jours'),
+        ('JOURNALIER', 'Journalier'),
+        ('WEEKLY', 'Descente chaque semaine'),
         ('BI_WEEKLY', 'Descend chaque 15 jours'),
         ('LIVE_IN', 'Logée'),
         ('LIVE_OUT', 'Non logée'),
@@ -159,3 +160,20 @@ class Expense(models.Model):
 
     def __str__(self):
         return f"{self.titre} - {self.montant} FCFA"
+
+class ClientRequest(models.Model):
+    nom_client = models.CharField(max_length=100)
+    telephone = models.CharField(max_length=20)
+    email = models.EmailField(blank=True, null=True)
+    poste_recherche = models.CharField(max_length=50, choices=Candidat.POSTE_CHOICES)
+    quartier = models.CharField(max_length=100)
+    budget_max = models.DecimalField(max_digits=10, decimal_places=0, help_text="Budget mensuel (FCFA)")
+    commentaires = models.TextField(blank=True, null=True)
+    date_demande = models.DateTimeField(auto_now_add=True)
+    est_traitee = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Demande de {self.nom_client} - {self.get_poste_recherche_display()}"
+
+    class Meta:
+        ordering = ['-date_demande']

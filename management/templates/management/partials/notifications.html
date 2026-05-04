@@ -1,8 +1,8 @@
 <div style="font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">Dernières Alertes</div>
 {% for n in notifs %}
-<div class="notif-item {{ n.type_notif|lower }}">
-    <div style="font-weight: 600;">{{ n.titre }}</div>
-    <div style="color: #64748b;">{{ n.message }}</div>
+<div class="notif-item {{ n.type_notif|lower }}" style="padding: 10px; border-bottom: 1px solid #f8fafc;">
+    <div class="notif-title" style="font-weight: 600;">{{ n.titre }}</div>
+    <div class="notif-message" style="color: #64748b; font-size: 0.85rem;">{{ n.message }}</div>
     <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 3px;">{{ n.date_creation|timesince }}</div>
 </div>
 {% empty %}

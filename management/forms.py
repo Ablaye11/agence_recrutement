@@ -1,5 +1,5 @@
 from django import forms
-from .models import Candidat, Client, Placement
+from .models import Candidat, Client, Placement, ClientRequest
 
 class CandidatForm(forms.ModelForm):
     class Meta:
@@ -59,4 +59,18 @@ class RegistrationForm(forms.ModelForm):
             'poste_recherche': forms.Select(attrs={'class': 'form-control'}),
             'experience': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'disponibilite': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class ClientRequestForm(forms.ModelForm):
+    class Meta:
+        model = ClientRequest
+        fields = ['nom_client', 'telephone', 'email', 'poste_recherche', 'quartier', 'budget_max', 'commentaires']
+        widgets = {
+            'nom_client': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Votre nom complet'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: 77 000 00 00'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'votre@email.com (optionnel)'}),
+            'poste_recherche': forms.Select(attrs={'class': 'form-control'}),
+            'quartier': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Quartier du travail'}),
+            'budget_max': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Montant en FCFA'}),
+            'commentaires': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Détails supplémentaires (ex: horaires, tâches...)'}),
         }

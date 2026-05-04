@@ -1,6 +1,6 @@
 {% extends 'management/base.html' %}
 
-{% block title %}Candidats - Agence Pro{% endblock %}
+{% block title %}Candidats - DAKAR TERMINUS{% endblock %}
 {% block page_title %}Registre des Candidats{% endblock %}
 
 {% block content %}
@@ -8,28 +8,72 @@
     {% csrf_token %}
     
     <div class="card" style="margin-bottom: 2rem;">
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
-            <input type="text" id="search-input" class="form-control" placeholder="Recherche rapide..." style="flex: 2;">
-            
-            <div style="margin-left: auto; display: flex; gap: 10px;">
-                <a href="{% url 'export_candidats_excel' %}" hx-boost="false" class="btn" style="background: #10b981; color: white; text-decoration: none;">📥 Exporter Excel</a>
-                <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="background: var(--success); text-decoration: none;">+ Ajouter un candidat</a>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+            <!-- Recherche texte -->
+            <div style="flex: 2; min-width: 250px;">
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Recherche Nom / Tel</label>
+                <input type="text" id="search-input" class="form-control" placeholder="Nom, prénom ou téléphone...">
+            </div>
+
+            <!-- Filtre Métier -->
+            <div style="flex: 1; min-width: 180px;">
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Métier</label>
+                <select id="filter-poste" class="form-control">
+                    <option value="">Tous les métiers</option>
+                    {% for key, value in poste_choices %}
+                    <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Filtre Zone -->
+            <div style="flex: 1; min-width: 150px;">
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Zone / Quartier</label>
+                <input type="text" id="filter-zone" class="form-control" placeholder="Ex: Plateau...">
+            </div>
+
+            <!-- Filtre Disponibilité -->
+            <div style="flex: 1; min-width: 150px;">
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Disponibilité</label>
+                <select id="filter-dispo" class="form-control">
+                    <option value="">Toutes</option>
+                    <option value="Descente chaque semaine">Descente chaque semaine</option>
+                    <option value="Journalier">Journalier</option>
+                    <option value="Descend chaque 15 jours">Chaque 15 jours</option>
+                    <option value="Logée">Logée</option>
+                    <option value="Non logée">Non logée</option>
+                </select>
+            </div>
+
+            <!-- Filtre Statut -->
+            <div style="flex: 1; min-width: 130px;">
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Statut</label>
+                <select id="filter-statut" class="form-control">
+                    <option value="">Tous</option>
+                    <option value="Disponible">Disponible</option>
+                    <option value="En attente">En attente</option>
+                    <option value="Placé">Placé</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <a href="{% url 'export_candidats_excel' %}" hx-boost="false" class="btn" style="background: #10b981; color: white; text-decoration: none;">📥 Excel</a>
+                <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="background: var(--success); text-decoration: none;">+ Nouveau</a>
             </div>
         </div>
     </div>
 
-    <!-- Barre d'actions groupées (flottante quand sélectionné) -->
-    <div id="bulk-actions-bar" style="display: none; position: sticky; top: 80px; background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 100; margin-bottom: 1rem; border: 2px solid var(--primary-color); align-items: center; gap: 1.5rem;">
+    <!-- Barre d'actions groupées -->
+    <div id="bulk-actions-bar" style="display: none; position: sticky; top: 80px; background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 100; margin-bottom: 1rem; border: 2px solid var(--primary-color); align-items: center; justify-content: space-between;">
         <span style="font-weight: 700; color: var(--primary-color);"><span id="selected-count">0</span> candidat(s) sélectionné(s)</span>
-        
         <div style="display: flex; gap: 10px; align-items: center;">
             <select name="action" class="form-control" style="width: auto;">
-                <option value="">-- Choisir une action --</option>
+                <option value="">-- Action --</option>
+                <option value="status_available">Disponible</option>
+                <option value="status_waiting">En attente</option>
                 {% if user.is_superuser %}
-                <option value="delete">Supprimer la sélection</option>
+                <option value="delete">Supprimer</option>
                 {% endif %}
-                <option value="status_available">Passer à 'Disponible'</option>
-                <option value="status_waiting">Passer à 'En attente'</option>
             </select>
             <button type="button" onclick="confirmBulkAction()" class="btn btn-primary">Appliquer</button>
         </div>
@@ -114,13 +158,41 @@
         });
     }
 
-    // Recherche instantanée simple
-    document.getElementById('search-input').addEventListener('keyup', function() {
-        const val = this.value.toLowerCase();
+    // Recherche multi-critères ultra-réactive
+    const searchInput = document.getElementById('search-input');
+    const filterPoste = document.getElementById('filter-poste');
+    const filterZone = document.getElementById('filter-zone');
+    const filterDispo = document.getElementById('filter-dispo');
+    const filterStatut = document.getElementById('filter-statut');
+
+    function applyFilters() {
+        const query = searchInput.value.toLowerCase();
+        const poste = filterPoste.value.toLowerCase();
+        const zone = filterZone.value.toLowerCase();
+        const dispo = filterDispo.value.toLowerCase();
+        const statut = filterStatut.value.toLowerCase();
+
         document.querySelectorAll('.candidat-row').forEach(row => {
             const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(val) ? '' : 'none';
+            
+            // On vérifie chaque critère
+            const matchText = text.includes(query);
+            const matchPoste = !poste || text.includes(poste);
+            const matchZone = !zone || text.includes(zone);
+            const matchDispo = !dispo || text.includes(dispo);
+            const matchStatut = !statut || text.includes(statut);
+
+            if (matchText && matchPoste && matchZone && matchDispo && matchStatut) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
+    }
+
+    [searchInput, filterPoste, filterZone, filterDispo, filterStatut].forEach(el => {
+        el.addEventListener('input', applyFilters);
+        if (el.tagName === 'SELECT') el.addEventListener('change', applyFilters);
     });
 </script>
 {% endblock %}

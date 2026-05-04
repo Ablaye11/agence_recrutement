@@ -12,8 +12,10 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.lib import colors
-from .models import Candidat, Client, Placement, Notification, Expense
-from .forms import CandidatForm, ClientForm, PlacementForm, RegistrationForm
+from .models import Candidat, Client, Placement, Notification, Expense, ClientRequest
+from django.core.mail import send_mail
+from django.conf import settings
+from .forms import CandidatForm, ClientForm, PlacementForm, RegistrationForm, ClientRequestForm
 from datetime import date, datetime, timedelta
 import json
 from django.core.exceptions import PermissionDenied
@@ -96,7 +98,13 @@ def candidat_list(request):
     if q: candidats = candidats.filter(Q(nom__icontains=q) | Q(prenom__icontains=q) | Q(telephone__icontains=q))
     if s: candidats = candidats.filter(statut=s)
     if p: candidats = candidats.filter(poste_recherche=p)
-    return render(request, 'management/candidat_list.html', {'candidats': candidats})
+    # Récupération des choix de métiers pour le filtre
+    poste_choices = Candidat.POSTE_CHOICES
+    
+    return render(request, 'management/candidat_list.html', {
+        'candidats': candidats,
+        'poste_choices': poste_choices
+    })
 
 @login_required
 @admin_only
@@ -154,8 +162,21 @@ def candidat_public_register(request):
     if request.method == 'POST':
         form = CandidatForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save(commit=False).statut = 'WAITING'; form.save()
-            Notification.objects.create(titre="Inscription en ligne", message="Un nouveau candidat s'est inscrit.", type_notif='WARNING')
+            obj = form.save(commit=False); obj.statut = 'WAITING'; obj.save()
+            Notification.objects.create(titre="Inscription en ligne", message=f"Nouveau candidat : {obj.nom} {obj.prenom}", type_notif='WARNING')
+            
+            # Envoi du mail
+            try:
+                send_mail(
+                    'Nouvelle inscription candidat',
+                    f"Un nouveau candidat vient de s'inscrire : {obj.nom} {obj.prenom}\nPoste : {obj.get_poste_recherche_display()}\nTéléphone : {obj.telephone}",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [settings.ADMIN_EMAIL],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print(f"--- ERREUR EMAIL : {e} ---")
+            
             return render(request, 'management/public_success.html')
     return render(request, 'management/public_register.html', {'form': CandidatForm()})
 
@@ -198,6 +219,19 @@ def placement_create(request):
         if form.is_valid():
             p = form.save(); p.candidat.statut = 'PLACED'; p.candidat.save()
             Notification.objects.create(titre="Placement", message=f"{p.candidat.nom} chez {p.client.nom}.", type_notif='INFO')
+            
+            # Envoi du mail
+            try:
+                send_mail(
+                    'Nouveau placement effectué',
+                    f"Un placement a été enregistré :\nCandidat : {p.candidat}\nClient : {p.client}\nCommission : {p.commission} FCFA",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [settings.ADMIN_EMAIL],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print(f"--- ERREUR EMAIL PLACEMENT : {e} ---")
+            
             return redirect('placement_list')
     return render(request, 'management/placement_form.html', {'form': PlacementForm(initial={'candidat': request.GET.get('candidat')})})
 
@@ -281,14 +315,110 @@ def export_candidats_excel(request):
 
 @login_required
 def generate_contract_pdf(request, pk):
-    p = get_object_or_404(Placement, pk=pk); buf = io.BytesIO(); c = canvas.Canvas(buf, pagesize=A4)
-    c.setFont("Helvetica-Bold", 16); c.drawString(2*cm, 27*cm, "CONTRAT DE PLACEMENT")
-    c.setFont("Helvetica", 12); c.drawString(2*cm, 25*cm, f"Employeur : {p.client.nom}")
-    c.drawString(2*cm, 24*cm, f"Candidat : {p.candidat.nom} {p.candidat.prenom}")
-    c.drawString(2*cm, 23*cm, f"Salaire : {p.salaire} FCFA"); c.showPage(); c.save(); buf.seek(0)
+    p = get_object_or_404(Placement, pk=pk)
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    width, height = A4
+
+    # --- Design & Cadre ---
+    c.setStrokeColor(colors.black)
+    c.setLineWidth(1)
+    c.rect(1*cm, 1*cm, width-2*cm, height-2*cm) # Cadre de page
+
+    # --- En-tête ---
+    c.setFont("Helvetica-Bold", 14)
+    c.drawCentredString(width/2, 28*cm, "REPUBLIQUE DU SENEGAL")
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(width/2, 27*cm, "DAKAR TERMINUS")
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width/2, 26*cm, "CONTRAT DE PLACEMENT")
+    c.setLineWidth(2)
+    c.line(2*cm, 26.5*cm, width-2*cm, 26.5*cm)
+
+    # --- Informations ---
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(2*cm, 25*cm, "1. LES PARTIES")
+    
+    c.setFont("Helvetica", 12)
+    c.drawString(2.5*cm, 24*cm, f"L'EMPLOYEUR : {p.client.nom.upper()}")
+    c.drawString(2.5*cm, 23.3*cm, f"Téléphone : {p.client.telephone}")
+    
+    c.drawString(2.5*cm, 22*cm, f"L'EMPLOYÉ(E) : {p.candidat.nom.upper()} {p.candidat.prenom}")
+    c.drawString(2.5*cm, 21.3*cm, f"Poste : {p.candidat.get_poste_recherche_display()}")
+
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(2*cm, 19*cm, "2. CONDITIONS DU CONTRAT")
+    
+    c.setFont("Helvetica", 12)
+    c.drawString(2.5*cm, 18*cm, f"Lieu de travail : {p.lieu_travail}")
+    c.drawString(2.5*cm, 17.3*cm, f"Date de début : {p.date_debut.strftime('%d/%m/%Y')}")
+    c.drawString(2.5*cm, 16.6*cm, f"Salaire mensuel : {p.salaire} FCFA")
+    c.drawString(2.5*cm, 15.9*cm, f"Statut : {p.get_statut_emploi_display()}")
+
+    # --- Signatures ---
+    c.line(2*cm, 10*cm, width-2*cm, 10*cm)
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(2*cm, 9*cm, "SIGNATURE EMPLOYEUR")
+    c.drawString(width-8*cm, 9*cm, "SIGNATURE EMPLOYÉ(E)")
+    
+    c.setFont("Helvetica-Oblique", 10)
+    c.drawString(2*cm, 4*cm, f"Fait à Dakar, le {date.today().strftime('%d/%m/%Y')}")
+    c.drawCentredString(width/2, 2*cm, "Document généré par DAKAR TERMINUS Management System")
+
+    c.showPage()
+    c.save()
+    buf.seek(0)
     return FileResponse(buf, as_attachment=True, filename=f"contrat_{p.pk}.pdf")
 
 @login_required
 def unpaid_commissions(request):
     unpaid = Placement.objects.filter(est_paye=False).order_by('-date_placement')
     return render(request, 'management/unpaid_commissions.html', {'unpaid': unpaid, 'total_due': unpaid.aggregate(Sum('commission'))['commission__sum'] or 0})
+
+@login_required
+@admin_only
+def client_request_accept(request, pk):
+    req = get_object_or_404(ClientRequest, pk=pk)
+    # Création du client officiel
+    Client.objects.create(
+        nom=req.nom_client,
+        telephone=req.telephone,
+        adresse=req.quartier
+    )
+    # On marque la demande comme traitée ou on la supprime
+    req.delete() 
+    messages.success(request, f"Le client {req.nom_client} a été ajouté avec succès !")
+    return redirect('client_list')
+
+@login_required
+def client_request_list(request):
+    requests = ClientRequest.objects.all()
+    return render(request, 'management/client_request_list.html', {'client_requests': requests})
+
+@login_required
+@admin_only
+def client_request_delete(request, pk):
+    get_object_or_404(ClientRequest, pk=pk).delete()
+    return redirect('client_request_list')
+
+def client_public_request(request):
+    if request.method == 'POST':
+        form = ClientRequestForm(request.POST)
+        if form.is_valid():
+            obj = form.save()
+            Notification.objects.create(titre="Nouvelle commande client", message=f"Besoin de : {obj.get_poste_recherche_display()} par {obj.nom_client}", type_notif='INFO')
+            
+            # Envoi du mail
+            try:
+                send_mail(
+                    'NOUVELLE COMMANDE CLIENT',
+                    f"Un client vient de faire une demande :\nClient : {obj.nom_client}\nPoste : {obj.get_poste_recherche_display()}\nZone : {obj.quartier}\nBudget : {obj.budget_max} FCFA\nContact : {obj.telephone}",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [settings.ADMIN_EMAIL],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print(f"--- ERREUR MAIL COMMANDE : {e} ---")
+            
+            return render(request, 'management/client_request_success.html')
+    return render(request, 'management/client_public_request.html', {'form': ClientRequestForm()})

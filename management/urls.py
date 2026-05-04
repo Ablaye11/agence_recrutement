@@ -35,4 +35,8 @@ urlpatterns = [
     path('export/candidats/', views.export_candidats_excel, name='export_candidats_excel'),
     path('api/notifications/', views.get_notifications, name='get_notifications'),
     path('placement/<int:pk>/pdf/', views.generate_contract_pdf, name='generate_contract_pdf'),
+    path('commandes-clients/', views.client_request_list, name='client_request_list'),
+    path('commande-client/accepter/<int:pk>/', views.client_request_accept, name='client_request_accept'),
+    path('commande-client/supprimer/<int:pk>/', views.client_request_delete, name='client_request_delete'),
+    path('demande-personnel/', views.client_public_request, name='client_public_request'),
 ]

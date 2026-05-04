@@ -31,7 +31,7 @@
     </div>
 
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">AGENCE PRO</div>
+        <div class="sidebar-logo">DAKAR TERMINUS</div>
         <div style="padding: 0 1.5rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
             <div style="font-weight: 700; color: white;">{{ user.username }}</div>
             <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">
@@ -61,7 +61,7 @@
             <li class="nav-item">
                 <a href="{% url 'inscriptions_en_attente' %}" class="nav-link {% if request.resolver_match.url_name == 'inscriptions_en_attente' %}active{% endif %}" style="display: flex; justify-content: space-between; align-items: center;">
                     Validations
-                    <div id="pending-badge-container" hx-get="{% url 'pending_count_api' %}" hx-trigger="every 120s">
+                    <div id="pending-badge-container" hx-get="{% url 'pending_count_api' %}" hx-trigger="every 5s">
                         {% if pending_validation_count > 0 %}
                         <span id="pending-badge" style="background: var(--warning); color: #000; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; font-weight: 800;">
                             {{ pending_validation_count }}
@@ -102,12 +102,36 @@
                     ⚠️ Commissions Impayées
                 </a>
             </li>
-            <li class="nav-item" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-                <a href="{% url 'public_register' %}" target="_blank" class="nav-link" style="color: var(--success); font-weight: 700;">
+            <li class="nav-item">
+                <a href="{% url 'client_request_list' %}" class="nav-link {% if request.resolver_match.url_name == 'client_request_list' %}active{% endif %}">
+                    📥 Commandes Clients
+                </a>
+            </li>
+            <li class="nav-item" style="margin-top: 1.5rem;">
+                <a href="{% url 'public_register' %}" target="_blank" style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; text-decoration: none; color: white; display: block; font-size: 0.85rem; transition: background 0.3s;">
                     📢 Portail Inscription
                 </a>
             </li>
+            <li class="nav-item" style="margin-top: 0.5rem;">
+                <a href="{% url 'client_public_request' %}" target="_blank" style="background: rgba(56, 189, 248, 0.2); border-radius: 12px; padding: 12px; text-decoration: none; color: #38bdf8; display: block; font-size: 0.85rem; transition: background 0.3s; border: 1px solid rgba(56, 189, 248, 0.3);">
+                    🤝 Portail Commandes
+                </a>
+            </li>
         </ul>
+        <div style="margin-top: auto; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.05);">
+            <div style="color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Assistance</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <a href="tel:778472424" style="color: #cbd5e1; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+                    📞 77 847 24 24
+                </a>
+                <a href="tel:785966363" style="color: #cbd5e1; text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+                    📞 78 596 63 63
+                </a>
+                <a href="mailto:dakarterminus@yahoo.com" style="color: #38bdf8; text-decoration: none; font-size: 0.75rem; word-break: break-all;">
+                    ✉️ dakarterminus@yahoo.com
+                </a>
+            </div>
+        </div>
         {% if user.is_superuser %}
         <div style="margin-top: auto; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
             <a href="/admin/" hx-boost="false" style="color: #94a3b8; font-size: 0.75rem; text-decoration: none;">Accès Technique (Admin)</a>
@@ -124,7 +148,7 @@
             <div class="user-info" style="display: flex; align-items: center; gap: 20px;">
                 <div style="position: relative;">
                     <span id="notif-bell" style="cursor: pointer; font-size: 1.2rem;">🔔</span>
-                    <div id="notif-dropdown" hx-get="{% url 'get_notifications' %}" hx-trigger="click, every 120s" style="display: none; position: absolute; right: 0; top: 100%; width: 280px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; padding: 10px;">
+                    <div id="notif-dropdown" hx-get="{% url 'get_notifications' %}" hx-trigger="click, every 5s" style="display: none; position: absolute; right: 0; top: 100%; width: 280px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; padding: 10px;">
                         Chargement...
                     </div>
                 </div>
@@ -181,6 +205,39 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/sw.js');
         }
+
+        // Système de TOAST instantané
+        let lastNotifContent = '';
+        function checkNewNotifications() {
+            fetch('/api/notifications/')
+                .then(response => response.text())
+                .then(html => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    const firstNotif = tempDiv.querySelector('.notif-item');
+                    
+                    if (firstNotif) {
+                        const notifText = firstNotif.innerText;
+                        if (window.lastNotifContent && window.lastNotifContent !== notifText) {
+                            const title = firstNotif.querySelector('.notif-title').innerText;
+                            const message = firstNotif.querySelector('.notif-message').innerText;
+                            
+                            Swal.fire({
+                                title: title,
+                                text: message,
+                                icon: 'info',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 5000,
+                                timerProgressBar: true
+                            });
+                        }
+                        window.lastNotifContent = notifText;
+                    }
+                });
+        }
+        setInterval(checkNewNotifications, 10000);
     </script>
 </body>
 </html>

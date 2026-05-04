@@ -1,0 +1,96 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Commandes Clients - DAKAR TERMINUS{% endblock %}
+{% block page_title %}Demandes de Personnel (Externes){% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Client</th>
+                    <th>Téléphone</th>
+                    <th>Poste Recherché</th>
+                    <th>Quartier</th>
+                    <th>Budget Max</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in requests %}
+                <tr>
+                    <td>{{ r.date_creation|date:"d/m/Y H:i" }}</td>
+                    <td style="font-weight: 600;">{{ r.nom_client }}</td>
+                    <td>{{ r.telephone }}</td>
+                    <td><span class="badge" style="background: #e0f2fe; color: #0369a1;">{{ r.get_poste_recherche_display }}</span></td>
+                    <td>{{ r.quartier }}</td>
+                    <td>{{ r.budget_max }} FCFA</td>
+                    <td>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="showDetails('{{ r.commentaires|escapejs }}')" class="btn" style="background: #f1f5f9; color: #475569; padding: 5px 10px; font-size: 0.8rem;">Détails</button>
+                            
+                            <button onclick="confirmAccept('{{ r.nom_client|escapejs }}', '{% url 'client_request_accept' r.pk %}')" class="btn" style="background: #dcfce7; color: #15803d; padding: 5px 10px; font-size: 0.8rem; border: none; font-weight: 700; cursor: pointer;">Accepter</button>
+
+                            {% if user.is_superuser %}
+                            <button onclick="confirmDelete('{% url 'client_request_delete' r.pk %}')" class="btn" style="background: #fee2e2; color: #b91c1c; padding: 5px 10px; font-size: 0.8rem; border: none; cursor: pointer;">Supprimer</button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: #94a3b8;">Aucune demande en attente.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function showDetails(msg) {
+    Swal.fire({
+        title: 'Commentaires du client',
+        text: msg || 'Aucun commentaire supplémentaire.',
+        icon: 'info',
+        confirmButtonColor: '#2563eb'
+    });
+}
+
+function confirmAccept(name, url) {
+    Swal.fire({
+        title: 'Accepter le client ?',
+        text: `Voulez-vous transformer "${name}" en client officiel ?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#15803d',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Oui, accepter',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+}
+
+function confirmDelete(url) {
+    Swal.fire({
+        title: 'Supprimer la demande ?',
+        text: "Cette action est irréversible !",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#b91c1c',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Oui, supprimer',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = url;
+        }
+    });
+}
+</script>
+{% endblock %}
