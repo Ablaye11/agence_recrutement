@@ -206,7 +206,7 @@ def client_delete(request, pk): get_object_or_404(Client, pk=pk).delete(); retur
 @login_required
 def placement_history(request):
     placements = Placement.objects.filter(statut_emploi='TERMINATED').order_by('-date_fin')
-    return render(request, 'management/placement_list.html', {'placements': placements, 'is_history': True})
+    return render(request, 'management/placement_history.html', {'placements': placements})
 
 @login_required
 def placement_list(request):

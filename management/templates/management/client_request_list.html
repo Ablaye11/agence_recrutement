@@ -19,7 +19,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for r in requests %}
+                {% for r in client_requests %}
                 <tr>
                     <td>{{ r.date_creation|date:"d/m/Y H:i" }}</td>
                     <td style="font-weight: 600;">{{ r.nom_client }}</td>

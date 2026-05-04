@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-5_wj6ra=_2_sa=&s9$s=fm+c$u^v=wgy^t33k(ujns55!mqpn1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*'] # À restreindre avec votre nom de domaine une fois acheté
+ALLOWED_HOSTS = ['dakarterminus.com', 'www.dakarterminus.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
