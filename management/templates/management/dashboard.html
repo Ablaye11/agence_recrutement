@@ -5,7 +5,7 @@
 {% block page_title %}Vue d'ensemble{% endblock %}
 
 {% block content %}
-<div hx-get="{% url 'dashboard' %}" hx-trigger="every 60s" hx-target="#main-content" hx-select="#main-content" style="width: 100%; overflow-x: hidden;">
+<div hx-get="{% url 'dashboard' %}" hx-trigger="every 15s" hx-target="#main-content" hx-select="#main-content">
 {% if total_attente > 0 %}
 <div class="card" style="border-left: 5px solid var(--warning); margin-bottom: 2rem;">
     <p style="margin: 0; display: flex; align-items: center; gap: 10px; font-weight: 600;">
@@ -113,9 +113,9 @@
                 new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: {{ labels_poste|safe }},
+                        labels: JSON.parse('{{ labels_poste|default:"[]"|escapejs }}'),
                         datasets: [{
-                            data: {{ data_poste|safe }},
+                            data: JSON.parse('{{ data_poste|default:"[]"|escapejs }}'),
                             backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
                             borderWidth: 0
                         }]

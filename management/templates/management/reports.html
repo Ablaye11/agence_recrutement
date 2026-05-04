@@ -66,10 +66,10 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: {{ js_labels|safe }},
+                    labels: JSON.parse('{{ js_labels|default:"[]"|escapejs }}'),
                     datasets: [{
                         label: 'Commissions (FCFA)',
-                        data: {{ js_data|safe }},
+                        data: JSON.parse('{{ js_data|default:"[]"|escapejs }}'),
                         borderColor: '#2563eb',
                         backgroundColor: 'rgba(37, 99, 235, 0.1)',
                         fill: true,

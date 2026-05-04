@@ -4,6 +4,7 @@
 {% block page_title %}Dossiers à Valider{% endblock %}
 
 {% block content %}
+<div hx-get="{% url 'inscriptions_en_attente' %}" hx-trigger="every 15s" hx-target="#main-content" hx-select="#main-content">
 <div class="card">
     <div class="card-title">Nouveaux dossiers reçus via le portail public</div>
     <div class="table-container">
@@ -43,5 +44,6 @@
             </tbody>
         </table>
     </div>
+</div>
 </div>
 {% endblock %}

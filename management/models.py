@@ -58,12 +58,12 @@ class Candidat(models.Model):
     age = models.PositiveIntegerField()
     telephone = models.CharField(max_length=20)
     adresse = models.CharField(max_length=255)
-    poste_recherche = models.CharField(max_length=50, choices=POSTE_CHOICES)
+    poste_recherche = models.CharField(max_length=50, choices=POSTE_CHOICES, db_index=True)
     experience = models.TextField()
     disponibilite = models.CharField(max_length=50, choices=DISPO_CHOICES)
-    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='AVAILABLE')
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='AVAILABLE', db_index=True)
     observations = models.TextField(blank=True)
-    date_inscription = models.DateTimeField(auto_now_add=True)
+    date_inscription = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def save(self, *args, **kwargs):
         if not self.matricule:

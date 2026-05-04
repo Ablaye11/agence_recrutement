@@ -4,6 +4,7 @@
 {% block page_title %}Demandes de Personnel (Externes){% endblock %}
 
 {% block content %}
+<div hx-get="{% url 'client_request_list' %}" hx-trigger="every 15s" hx-target="#main-content" hx-select="#main-content">
 <div class="card">
     <div style="overflow-x: auto;">
         <table>
@@ -93,4 +94,5 @@ function confirmDelete(url) {
     });
 }
 </script>
+</div>
 {% endblock %}

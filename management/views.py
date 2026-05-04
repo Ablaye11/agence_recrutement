@@ -58,7 +58,7 @@ def dashboard(request):
         'labels_poste': json.dumps([str(dict(Candidat.POSTE_CHOICES).get(p['poste_recherche'])) for p in postes_stats]),
         'data_poste': json.dumps([p['total'] for p in postes_stats]),
         'recent_candidats': Candidat.objects.order_by('-date_inscription')[:5],
-        'recent_placements': Placement.objects.order_by('-date_placement')[:5],
+        'recent_placements': Placement.objects.select_related('candidat', 'client').order_by('-date_placement')[:5],
     }
     return render(request, 'management/dashboard.html', context)
 
@@ -87,6 +87,7 @@ def statistics(request):
 
 # --- CANDIDATS ---
 @login_required
+@admin_only
 def inscriptions_en_attente(request):
     candidats = Candidat.objects.filter(statut='WAITING').order_by('-date_inscription')
     return render(request, 'management/inscriptions_en_attente.html', {'candidats': candidats})
@@ -205,12 +206,12 @@ def client_delete(request, pk): get_object_or_404(Client, pk=pk).delete(); retur
 # --- PLACEMENTS ---
 @login_required
 def placement_history(request):
-    placements = Placement.objects.filter(statut_emploi='TERMINATED').order_by('-date_fin')
+    placements = Placement.objects.select_related('candidat', 'client').filter(statut_emploi='TERMINATED').order_by('-date_fin')
     return render(request, 'management/placement_history.html', {'placements': placements})
 
 @login_required
 def placement_list(request):
-    return render(request, 'management/placement_list.html', {'placements': Placement.objects.filter(statut_emploi='ACTIVE').order_by('-date_placement')})
+    return render(request, 'management/placement_list.html', {'placements': Placement.objects.select_related('candidat', 'client').filter(statut_emploi='ACTIVE').order_by('-date_placement')})
 
 @login_required
 def placement_create(request):
@@ -372,7 +373,7 @@ def generate_contract_pdf(request, pk):
 
 @login_required
 def unpaid_commissions(request):
-    unpaid = Placement.objects.filter(est_paye=False).order_by('-date_placement')
+    unpaid = Placement.objects.select_related('candidat', 'client').filter(est_paye=False).order_by('-date_placement')
     return render(request, 'management/unpaid_commissions.html', {'unpaid': unpaid, 'total_due': unpaid.aggregate(Sum('commission'))['commission__sum'] or 0})
 
 @login_required
