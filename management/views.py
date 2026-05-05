@@ -92,8 +92,23 @@ def inscriptions_en_attente(request):
     return render(request, 'management/inscriptions_en_attente.html', {'candidats': candidats})
 
 @login_required
+@admin_only
+def candidat_refuse(request, pk):
+    c = get_object_or_404(Candidat, pk=pk)
+    if c.statut == 'WAITING':
+        c.statut = 'REFUSED'; c.save()
+        Notification.objects.create(titre="Refusé", message=f"{c.nom} a été refusé.", type_notif='WARNING')
+    return redirect('inscriptions_en_attente')
+
+@login_required
+@admin_only
+def candidats_refuses(request):
+    candidats = Candidat.objects.filter(statut='REFUSED').order_by('-date_inscription')
+    return render(request, 'management/candidats_refuses.html', {'candidats': candidats})
+
+@login_required
 def candidat_list(request):
-    candidats = Candidat.objects.all()
+    candidats = Candidat.objects.exclude(statut='REFUSED')
     q = request.GET.get('q'); s = request.GET.get('statut'); p = request.GET.get('poste')
     if q: candidats = candidats.filter(Q(nom__icontains=q) | Q(prenom__icontains=q) | Q(telephone__icontains=q))
     if s: candidats = candidats.filter(statut=s)
@@ -160,7 +175,7 @@ def candidat_approve(request, pk):
 
 def candidat_public_register(request):
     if request.method == 'POST':
-        form = CandidatForm(request.POST, request.FILES)
+        form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             obj = form.save(commit=False); obj.statut = 'WAITING'; obj.save()
             Notification.objects.create(titre="Inscription en ligne", message=f"Nouveau candidat : {obj.nom} {obj.prenom}", type_notif='WARNING')
@@ -178,7 +193,7 @@ def candidat_public_register(request):
                 print(f"--- ERREUR EMAIL : {e} ---")
             
             return render(request, 'management/public_success.html')
-    return render(request, 'management/public_register.html', {'form': CandidatForm()})
+    return render(request, 'management/public_register.html', {'form': RegistrationForm()})
 
 # --- CLIENTS & CRM ---
 @login_required
@@ -246,9 +261,20 @@ def placement_edit(request, pk):
 @login_required
 def placement_terminate(request, pk):
     p = get_object_or_404(Placement, pk=pk)
+    action = request.GET.get('action', 'TERMINATED') # ACTIVE -> TERMINATED or LEFT
     if p.statut_emploi == 'ACTIVE':
-        p.statut_emploi = 'TERMINATED'; p.date_fin = date.today(); p.save()
-        p.candidat.statut = 'AVAILABLE'; p.candidat.save()
+        p.statut_emploi = action
+        p.date_fin = date.today()
+        p.save()
+        p.candidat.statut = 'AVAILABLE'
+        p.candidat.save()
+        
+        status_label = "Contrat terminé" if action == 'TERMINATED' else "A quitté le poste"
+        Notification.objects.create(
+            titre="Fin de placement", 
+            message=f"{p.candidat.nom} : {status_label}.", 
+            type_notif='INFO'
+        )
     return redirect('placement_list')
 
 @login_required
@@ -318,8 +344,40 @@ def placement_print(request, pk):
 @login_required
 def pending_validation_count(request): return render(request, 'management/partials/pending_badge.html', {'count': Candidat.objects.filter(statut='WAITING').count()})
 
+# --- NOTIFICATIONS CENTER ---
 @login_required
-def get_notifications(request): return render(request, 'management/partials/notifications.html', {'notifs': Notification.objects.filter(lu=False)[:5]})
+def notification_center(request):
+    notifs = Notification.objects.all().order_by('-date_creation')
+    return render(request, 'management/notifications.html', {'notifications': notifs})
+
+@login_required
+def mark_notification_as_read(request, pk):
+    notif = get_object_or_404(Notification, pk=pk)
+    notif.lu = True
+    notif.save()
+    
+    if request.headers.get('HX-Request'):
+        # On peut soit renvoyer rien pour faire disparaître l'item
+        # Soit renvoyer l'item mis à jour. Ici on va juste le laisser disparaître de la liste des "non lus"
+        # ou simplement rester sur la page.
+        return HttpResponse("") 
+        
+    return redirect(request.META.get('HTTP_REFERER', 'notification_center'))
+
+@login_required
+def mark_all_notifications_as_read(request):
+    Notification.objects.filter(lu=False).update(lu=True)
+    return redirect(request.META.get('HTTP_REFERER', 'notification_center'))
+
+@login_required
+def get_notifications(request): 
+    # Dropdown only shows unread
+    notifs = Notification.objects.filter(lu=False)[:10]
+    unread_count = Notification.objects.filter(lu=False).count()
+    return render(request, 'management/partials/notifications.html', {
+        'notifs': notifs,
+        'unread_count': unread_count
+    })
 
 @login_required
 def export_candidats_excel(request):
@@ -402,15 +460,43 @@ def client_request_accept(request, pk):
         telephone=req.telephone,
         adresse=req.quartier
     )
-    # On marque la demande comme traitée ou on la supprime
-    req.delete() 
+    # On marque la demande comme acceptée
+    req.statut = 'ACCEPTED'
+    req.save()
     messages.success(request, f"Le client {req.nom_client} a été ajouté avec succès !")
     return redirect('client_list')
 
 @login_required
+@admin_only
+def client_request_refuse(request, pk):
+    req = get_object_or_404(ClientRequest, pk=pk)
+    req.statut = 'REFUSED'
+    req.save()
+    messages.warning(request, f"La demande de {req.nom_client} a été refusée.")
+    return redirect('client_request_list')
+
+@login_required
 def client_request_list(request):
-    requests = ClientRequest.objects.all()
+    requests = ClientRequest.objects.filter(statut='PENDING').order_by('-date_demande')
     return render(request, 'management/client_request_list.html', {'client_requests': requests})
+
+@login_required
+def client_request_create(request):
+    if request.method == 'POST':
+        form = ClientRequestForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Demande de personnel enregistrée.")
+            return redirect('client_request_list')
+    else:
+        form = ClientRequestForm()
+    return render(request, 'management/client_request_form.html', {'form': form})
+
+@login_required
+@admin_only
+def client_requests_refused(request):
+    requests = ClientRequest.objects.filter(statut='REFUSED')
+    return render(request, 'management/client_requests_refused.html', {'client_requests': requests})
 
 @login_required
 @admin_only

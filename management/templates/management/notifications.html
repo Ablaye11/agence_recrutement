@@ -1,0 +1,90 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Centre de Notifications - DAKAR TERMINUS{% endblock %}
+{% block page_title %}Centre de Notifications{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem;">
+        <h2 style="margin: 0; font-size: 1.5rem; color: #1e293b;">Historique des Notifications</h2>
+        <a href="{% url 'mark_all_notifications_as_read' %}" class="btn btn-secondary" style="font-size: 0.85rem;">Tout marquer comme lu</a>
+    </div>
+
+    <div class="notification-list">
+        {% for notif in notifications %}
+        <div class="notif-item {% if not notif.lu %}unread{% endif %} notif-{{ notif.type_notif|lower }}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4 class="notif-title" style="margin: 0 0 5px 0; font-weight: 700; color: #1e293b;">{{ notif.titre }}</h4>
+                    <p class="notif-message" style="margin: 0; color: #64748b; font-size: 0.95rem;">{{ notif.message }}</p>
+                    <small style="color: #94a3b8; font-size: 0.8rem; display: block; margin-top: 8px;">{{ notif.date_creation|date:"d M Y, H:i" }}</small>
+                </div>
+                {% if not notif.lu %}
+                <button hx-get="{% url 'mark_notification_as_read' notif.pk %}" 
+                        hx-target="closest .notif-item" 
+                        hx-swap="outerHTML"
+                        class="btn-read" 
+                        style="border: none; cursor: pointer;">
+                    Marquer comme lu
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+            <p>Aucune notification pour le moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .notif-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        position: relative;
+        transition: all 0.3s;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        background: white;
+        border-left: 5px solid #3b82f6;
+    }
+    .notif-item.unread {
+        background: #f0f9ff;
+    }
+    .notif-item.notif-success { border-left-color: #10b981; }
+    .notif-item.notif-warning { border-left-color: #f59e0b; }
+    .notif-item.notif-danger { border-left-color: #ef4444; }
+    .notif-item.notif-info { border-left-color: #3b82f6; }
+
+    .notif-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .unread::after {
+        content: '';
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 10px;
+        height: 10px;
+        background: #3b82f6;
+        border-radius: 50%;
+    }
+    .btn-read {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 0.75rem;
+        text-decoration: none;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .btn-read:hover {
+        background: #2563eb;
+    }
+</style>
+{% endblock %}

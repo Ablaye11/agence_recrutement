@@ -31,6 +31,7 @@
                         <div style="display: flex; gap: 0.5rem;">
                             <a href="{% url 'candidat_detail' c.pk %}" class="badge badge-placed" style="text-decoration: none;">Détails</a>
                             <a href="{% url 'candidat_approve' c.pk %}" class="badge badge-available" style="text-decoration: none;">Approuver</a>
+                            <a href="{% url 'candidat_refuse' c.pk %}" class="badge" style="background: #ef4444; color: white; text-decoration: none;">Refuser</a>
                         </div>
                     </td>
                 </tr>

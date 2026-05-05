@@ -83,17 +83,21 @@ document.querySelectorAll('.terminate-btn').forEach(btn => {
         
         Swal.fire({
             title: 'Terminer le contrat ?',
-            text: "La candidate " + name + " sera libérée et redeviendra disponible pour d'autres clients.",
-            icon: 'warning',
+            text: `Quel est le motif de la fin de contrat pour ${name} ?`,
+            icon: 'question',
             showCancelButton: true,
+            showDenyButton: true,
             confirmButtonColor: '#2563eb',
+            denyButtonColor: '#f59e0b',
             cancelButtonColor: '#64748b',
-            confirmButtonText: 'Oui, terminer le contrat',
-            cancelButtonText: 'Annuler',
-            borderRadius: '1rem'
+            confirmButtonText: 'Contrat Terminé',
+            denyButtonText: 'A quitté le poste',
+            cancelButtonText: 'Annuler'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = url;
+                window.location.href = url + '?action=TERMINATED';
+            } else if (result.isDenied) {
+                window.location.href = url + '?action=LEFT';
             }
         });
     });

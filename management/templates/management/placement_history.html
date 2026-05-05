@@ -37,7 +37,8 @@
                 </td>
                 <td>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <a href="{% url 'placement_print' p.pk %}" target="_blank" style="color: #475569; font-weight: 600; text-decoration: none;">📄 Revoir Contrat</a>
+                        <a href="{% url 'placement_edit' p.pk %}" style="color: var(--primary-color); font-weight: 700; text-decoration: none; font-size: 0.9rem;">✏️ Modifier</a>
+                        <a href="{% url 'placement_print' p.pk %}" target="_blank" style="color: #475569; font-weight: 600; text-decoration: none; font-size: 0.9rem;">📄 Revoir Contrat</a>
                         <button class="btn delete-placement-btn" 
                                 data-url="{% url 'placement_delete' p.pk %}"
                                 data-name="{{ p.candidat.nom|escapejs }} {{ p.candidat.prenom|escapejs }}"

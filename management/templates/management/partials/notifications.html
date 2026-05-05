@@ -1,10 +1,42 @@
 <div style="font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">Dernières Alertes</div>
-{% for n in notifs %}
-<div class="notif-item {{ n.type_notif|lower }}" style="padding: 10px; border-bottom: 1px solid #f8fafc;">
-    <div class="notif-title" style="font-weight: 600;">{{ n.titre }}</div>
-    <div class="notif-message" style="color: #64748b; font-size: 0.85rem;">{{ n.message }}</div>
-    <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 3px;">{{ n.date_creation|timesince }}</div>
+{% if notifs %}
+    <div style="max-height: 350px; overflow-y: auto;">
+        {% for notif in notifs %}
+        <div class="notif-item" style="padding: 12px; border-bottom: 1px solid #f1f5f9; position: relative; transition: background 0.2s;">
+            <a href="{% url 'notification_center' %}" style="text-decoration: none; color: inherit; display: flex; gap: 10px; align-items: flex-start; padding-right: 25px;">
+                <div style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%; margin-top: 6px; flex-shrink: 0;"></div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 700; font-size: 0.85rem; color: #1e293b;">{{ notif.titre }}</div>
+                    <div style="font-size: 0.8rem; color: #64748b; margin: 2px 0;">{{ notif.message|truncatechars:60 }}</div>
+                    <div style="font-size: 0.7rem; color: #94a3b8;">{{ notif.date_creation|timesince }} ago</div>
+                </div>
+            </a>
+            <button hx-get="{% url 'mark_notification_as_read' notif.pk %}" 
+                    hx-target="closest .notif-item" 
+                    hx-swap="outerHTML"
+                    style="position: absolute; right: 8px; top: 8px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.2rem; padding: 0 5px;"
+                    title="Marquer comme lu">
+                ×
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    <div style="padding: 10px; text-align: center; border-top: 1px solid #f1f5f9;">
+        <a href="{% url 'notification_center' %}" style="font-size: 0.8rem; color: #3b82f6; text-decoration: none; font-weight: 600;">Voir tout l'historique</a>
+    </div>
+{% else %}
+    <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 0.9rem;">
+        Aucune nouvelle notification
+    </div>
+    <div style="padding: 10px; text-align: center; border-top: 1px solid #f1f5f9;">
+        <a href="{% url 'notification_center' %}" style="font-size: 0.8rem; color: #64748b; text-decoration: none;">Voir l'historique</a>
+    </div>
+{% endif %}
+
+<div id="notif-count-update" hx-swap-oob="true">
+    {% if unread_count > 0 %}
+    <span style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.65rem; padding: 2px 5px; border-radius: 50%; font-weight: 800;">
+        {{ unread_count }}
+    </span>
+    {% endif %}
 </div>
-{% empty %}
-<div style="text-align: center; color: #94a3b8; padding: 10px;">Aucune notification.</div>
-{% endfor %}

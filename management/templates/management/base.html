@@ -71,6 +71,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{% url 'candidats_refuses' %}" class="nav-link {% if request.resolver_match.url_name == 'candidats_refuses' %}active{% endif %}" style="color: #94a3b8; font-size: 0.85rem;">
+                    📁 Dossiers Refusés
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{% url 'placement_list' %}" class="nav-link {% if request.resolver_match.url_name == 'placement_list' %}active{% endif %}">
                     Suivi Placements
                 </a>
@@ -148,9 +153,19 @@
             <h1>{% block page_title %}Tableau de bord{% endblock %}</h1>
             <div class="user-info" style="display: flex; align-items: center; gap: 20px;">
                 <div style="position: relative;">
-                    <span id="notif-bell" style="cursor: pointer; font-size: 1.2rem;">🔔</span>
-                    <div id="notif-dropdown" hx-get="{% url 'get_notifications' %}" hx-trigger="click, every 5s" style="display: none; position: absolute; right: 0; top: 100%; width: 280px; background: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000; padding: 10px;">
-                        Chargement...
+                    <span id="notif-bell" style="cursor: pointer; font-size: 1.2rem; position: relative;" hx-get="{% url 'get_notifications' %}" hx-target="#notif-dropdown" hx-trigger="click, every 10s">
+                        🔔
+                        <div id="notif-count-update" style="display: inline;">
+                            {% if unread_notifications_count > 0 %}
+                            <span style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.65rem; padding: 2px 5px; border-radius: 50%; font-weight: 800;">
+                                {{ unread_notifications_count }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </span>
+                    <div id="notif-dropdown" style="display: none; position: absolute; right: 0; top: 100%; width: 300px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 1000; padding: 0; overflow: hidden;">
+                        <div style="padding: 10px; border-bottom: 1px solid #f1f5f9; font-weight: 700; font-size: 0.9rem;">Notifications</div>
+                        <div id="notif-items-container">Chargement...</div>
                     </div>
                 </div>
                 <span>{{ user.username|capfirst }}</span>

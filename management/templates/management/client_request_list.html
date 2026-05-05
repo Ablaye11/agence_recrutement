@@ -30,12 +30,31 @@
                     <td>{{ r.budget_max }} FCFA</td>
                     <td>
                         <div style="display: flex; gap: 10px;">
-                            <button onclick="showDetails('{{ r.commentaires|escapejs }}')" class="btn" style="background: #f1f5f9; color: #475569; padding: 5px 10px; font-size: 0.8rem;">Détails</button>
+                            <button class="btn btn-details" 
+                                    data-msg="{{ r.commentaires|escapejs }}"
+                                    style="background: #f1f5f9; color: #475569; padding: 5px 10px; font-size: 0.8rem; border: none; border-radius: 6px; cursor: pointer;">
+                                Détails
+                            </button>
                             
-                            <button onclick="confirmAccept('{{ r.nom_client|escapejs }}', '{% url 'client_request_accept' r.pk %}')" class="btn" style="background: #dcfce7; color: #15803d; padding: 5px 10px; font-size: 0.8rem; border: none; font-weight: 700; cursor: pointer;">Accepter</button>
+                            <button class="btn btn-accept" 
+                                    data-url="{% url 'client_request_accept' r.pk %}" 
+                                    data-name="{{ r.nom_client|escapejs }}"
+                                    style="background: #dcfce7; color: #15803d; padding: 5px 10px; font-size: 0.8rem; border: none; font-weight: 700; cursor: pointer; border-radius: 6px;">
+                                Accepter
+                            </button>
+
+                            <button class="btn btn-refuse" 
+                                    data-url="{% url 'client_request_refuse' r.pk %}"
+                                    style="background: #fef3c7; color: #b45309; padding: 5px 10px; font-size: 0.8rem; border: none; font-weight: 700; cursor: pointer; border-radius: 6px;">
+                                Refuser
+                            </button>
 
                             {% if user.is_superuser %}
-                            <button onclick="confirmDelete('{% url 'client_request_delete' r.pk %}')" class="btn" style="background: #fee2e2; color: #b91c1c; padding: 5px 10px; font-size: 0.8rem; border: none; cursor: pointer;">Supprimer</button>
+                            <button class="btn btn-delete" 
+                                    data-url="{% url 'client_request_delete' r.pk %}"
+                                    style="background: #fee2e2; color: #b91c1c; padding: 5px 10px; font-size: 0.8rem; border: none; cursor: pointer; border-radius: 6px;">
+                                Supprimer
+                            </button>
                             {% endif %}
                         </div>
                     </td>
@@ -50,49 +69,84 @@
     </div>
 </div>
 
+    <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <a href="{% url 'client_request_create' %}" class="btn btn-primary" style="text-decoration: none;">+ Nouvelle Commande (Interne)</a>
+        <a href="{% url 'client_requests_refused' %}" class="btn" style="background: #f1f5f9; color: #64748b; text-decoration: none; font-size: 0.85rem; padding: 8px 16px; border-radius: 10px;">📂 Voir les commandes refusées</a>
+    </div>
+</div>
+
 <script>
-function showDetails(msg) {
-    Swal.fire({
-        title: 'Commentaires du client',
-        text: msg || 'Aucun commentaire supplémentaire.',
-        icon: 'info',
-        confirmButtonColor: '#2563eb'
-    });
-}
+document.querySelectorAll('.btn-details').forEach(btn => {
+    btn.onclick = function() {
+        Swal.fire({
+            title: 'Commentaires du client',
+            text: this.dataset.msg || 'Aucun commentaire supplémentaire.',
+            icon: 'info',
+            confirmButtonColor: '#2563eb'
+        });
+    }
+});
 
-function confirmAccept(name, url) {
-    Swal.fire({
-        title: 'Accepter le client ?',
-        text: `Voulez-vous transformer "${name}" en client officiel ?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#15803d',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: 'Oui, accepter',
-        cancelButtonText: 'Annuler'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = url;
-        }
-    });
-}
+document.querySelectorAll('.btn-refuse').forEach(btn => {
+    btn.onclick = function() {
+        const url = this.dataset.url;
+        Swal.fire({
+            title: 'Refuser la commande ?',
+            text: "La commande sera déplacée dans les commandes refusées pour réévaluation ultérieure.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, refuser',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+});
 
-function confirmDelete(url) {
-    Swal.fire({
-        title: 'Supprimer la demande ?',
-        text: "Cette action est irréversible !",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#b91c1c',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: 'Oui, supprimer',
-        cancelButtonText: 'Annuler'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = url;
-        }
-    });
-}
+document.querySelectorAll('.btn-accept').forEach(btn => {
+    btn.onclick = function() {
+        const url = this.dataset.url;
+        const name = this.dataset.name;
+        Swal.fire({
+            title: 'Accepter le client ?',
+            text: `Voulez-vous transformer "${name}" en client officiel ?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#15803d',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, accepter',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+});
+
+document.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.onclick = function() {
+        const url = this.dataset.url;
+        Swal.fire({
+            title: 'Supprimer définitivement ?',
+            text: "Cette action est irréversible et supprimera totalement la trace de cette commande !",
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#b91c1c',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+});
 </script>
 </div>
 {% endblock %}

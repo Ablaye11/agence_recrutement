@@ -1,0 +1,50 @@
+{% extends 'management/base.html' %}
+
+{% block title %}Commandes Refusées - DAKAR TERMINUS{% endblock %}
+{% block page_title %}Commandes Clients Refusées{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-title">Historique des commandes refusées</div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Poste</th>
+                    <th>Zone</th>
+                    <th>Budget</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in client_requests %}
+                <tr>
+                    <td>
+                        <strong>{{ req.nom_client }}</strong><br>
+                        <small>{{ req.telephone }}</small>
+                    </td>
+                    <td>{{ req.get_poste_recherche_display }}</td>
+                    <td>{{ req.quartier }}</td>
+                    <td>{{ req.budget_max }} FCFA</td>
+                    <td>{{ req.date_demande|date:"d/m/Y" }}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'client_request_accept' req.pk %}" class="badge badge-available" style="text-decoration: none;">Accepter</a>
+                            <a href="{% url 'client_request_delete' req.pk %}" class="badge" style="background: #ef4444; color: white; text-decoration: none;" onclick="return confirm('Supprimer définitivement cette commande ?')">Supprimer</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                        Aucune commande refusée.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

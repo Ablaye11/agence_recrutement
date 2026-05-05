@@ -47,6 +47,7 @@ class Candidat(models.Model):
         ('AVAILABLE', 'Disponible'),
         ('PLACED', 'Placé'),
         ('WAITING', 'En attente'),
+        ('REFUSED', 'Refusé'),
     ]
 
     matricule = models.CharField(max_length=20, unique=True, editable=False)
@@ -62,7 +63,8 @@ class Candidat(models.Model):
     experience = models.TextField()
     disponibilite = models.CharField(max_length=50, choices=DISPO_CHOICES)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='AVAILABLE', db_index=True)
-    observations = models.TextField(blank=True)
+    commentaire = models.TextField(blank=True, null=True, verbose_name="Commentaire (Candidat)")
+    observations = models.TextField(blank=True, verbose_name="Observations (Admin)")
     date_inscription = models.DateTimeField(auto_now_add=True, db_index=True)
 
     def save(self, *args, **kwargs):
@@ -171,7 +173,12 @@ class ClientRequest(models.Model):
     budget_max = models.DecimalField(max_digits=10, decimal_places=0, help_text="Budget mensuel (FCFA)")
     commentaires = models.TextField(blank=True, null=True)
     date_demande = models.DateTimeField(auto_now_add=True)
-    est_traitee = models.BooleanField(default=False)
+    STATUT_CHOICES = [
+        ('PENDING', 'En attente'),
+        ('ACCEPTED', 'Acceptée'),
+        ('REFUSED', 'Refusée'),
+    ]
+    statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='PENDING')
 
     def __str__(self):
         return f"Demande de {self.nom_client} - {self.get_poste_recherche_display()}"
