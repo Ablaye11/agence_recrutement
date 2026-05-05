@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Agence de Recrutement{% endblock %}</title>
+    <title>{% block title %}DAKAR TERMINUS{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.1">
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <meta name="theme-color" content="#2563eb">
@@ -96,12 +96,13 @@
                     Dépenses
                 </a>
             </li>
-            {% endif %}
             <li class="nav-item">
                 <a href="{% url 'unpaid_commissions' %}" class="nav-link {% if request.resolver_match.url_name == 'unpaid_commissions' %}active{% endif %}" style="color: #fda4af;">
                     ⚠️ Commissions Impayées
                 </a>
             </li>
+            {% endif %}
+
             <li class="nav-item">
                 <a href="{% url 'client_request_list' %}" class="nav-link {% if request.resolver_match.url_name == 'client_request_list' %}active{% endif %}">
                     📥 Commandes Clients

@@ -19,6 +19,8 @@ urlpatterns = [
     path('placement/nouveau/', views.placement_create, name='placement_create'),
     path('placement/<int:pk>/modifier/', views.placement_edit, name='placement_edit'),
     path('placement/<int:pk>/terminer/', views.placement_terminate, name='placement_terminate'),
+    path('placement/<int:pk>/supprimer/', views.placement_delete, name='placement_delete'),
+
     path('clients/', views.client_list, name='client_list'),
     path('client/nouveau/', views.client_create, name='client_create'),
     path('rapports/', views.finance_reports, name='finance_reports'),
@@ -32,6 +34,8 @@ urlpatterns = [
     path('client/<int:pk>/', views.client_detail, name='client_detail'),
     path('depenses/', views.expense_list, name='expense_list'),
     path('depenses/nouvelle/', views.expense_create, name='expense_create'),
+    path('depenses/<int:pk>/supprimer/', views.expense_delete, name='expense_delete'),
+
     path('export/candidats/', views.export_candidats_excel, name='export_candidats_excel'),
     path('api/notifications/', views.get_notifications, name='get_notifications'),
     path('placement/<int:pk>/pdf/', views.generate_contract_pdf, name='generate_contract_pdf'),

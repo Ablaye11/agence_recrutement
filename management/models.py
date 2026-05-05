@@ -98,6 +98,7 @@ class Client(models.Model):
 class Placement(models.Model):
     STATUT_EMPLOI = [
         ('ACTIVE', 'En poste'),
+        ('TERMINATED', 'Contrat terminé'),
         ('LEFT', 'A quitté le poste'),
     ]
 

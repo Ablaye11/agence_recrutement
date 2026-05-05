@@ -228,3 +228,19 @@ td {
 .notif-item.warning { border-left-color: #f59e0b; }
 .notif-item.danger { border-left-color: #ef4444; }
 .notif-item.info { border-left-color: #2563eb; }
+
+/* Badges */
+.badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.badge-waiting { background: #fef3c7; color: #92400e; }
+.badge-available { background: #ecfdf5; color: #065f46; }
+.badge-placed { background: #eff6ff; color: #1e40af; }
+.badge-terminated { background: #f1f5f9; color: #475569; }

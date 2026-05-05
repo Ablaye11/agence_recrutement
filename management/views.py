@@ -87,7 +87,6 @@ def statistics(request):
 
 # --- CANDIDATS ---
 @login_required
-@admin_only
 def inscriptions_en_attente(request):
     candidats = Candidat.objects.filter(statut='WAITING').order_by('-date_inscription')
     return render(request, 'management/inscriptions_en_attente.html', {'candidats': candidats})
@@ -252,6 +251,14 @@ def placement_terminate(request, pk):
         p.candidat.statut = 'AVAILABLE'; p.candidat.save()
     return redirect('placement_list')
 
+@login_required
+@admin_only
+def placement_delete(request, pk):
+    get_object_or_404(Placement, pk=pk).delete()
+    messages.success(request, "Placement supprimé de l'historique.")
+    return redirect('placement_history')
+
+
 # --- FINANCE & EXPENSES ---
 @login_required
 @admin_only
@@ -288,6 +295,14 @@ def expense_create(request):
         )
         return redirect('expense_list')
     return render(request, 'management/expense_form.html')
+
+@login_required
+@admin_only
+def expense_delete(request, pk):
+    get_object_or_404(Expense, pk=pk).delete()
+    messages.success(request, "Dépense supprimée.")
+    return redirect('expense_list')
+
 
 @login_required
 def candidat_print(request, pk):
@@ -372,8 +387,9 @@ def generate_contract_pdf(request, pk):
     return FileResponse(buf, as_attachment=True, filename=f"contrat_{p.pk}.pdf")
 
 @login_required
+@admin_only
 def unpaid_commissions(request):
-    unpaid = Placement.objects.select_related('candidat', 'client').filter(est_paye=False).order_by('-date_placement')
+    unpaid = Placement.objects.select_related('candidat', 'client').filter(est_paye=False, statut_emploi='ACTIVE').order_by('-date_placement')
     return render(request, 'management/unpaid_commissions.html', {'unpaid': unpaid, 'total_due': unpaid.aggregate(Sum('commission'))['commission__sum'] or 0})
 
 @login_required

@@ -20,11 +20,14 @@
             <label style="color: var(--text-muted); font-size: 0.8rem;">Adresse</label>
             <div>{{ client.adresse }}</div>
         </div>
+        {% if user.is_superuser %}
         <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
         <div style="background: var(--primary-color); color: white; padding: 1rem; border-radius: 12px; text-align: center;">
             <div style="font-size: 0.8rem; opacity: 0.8;">Total Commissions Versées</div>
             <div style="font-size: 1.5rem; font-weight: 800;">{{ total_paye }} FCFA</div>
         </div>
+        {% endif %}
+
     </div>
 
     <!-- Historique des Placements -->

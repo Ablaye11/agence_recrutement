@@ -29,8 +29,8 @@
                     <td>{{ c.date_inscription|date:"d/m/Y H:i" }}</td>
                     <td>
                         <div style="display: flex; gap: 0.5rem;">
-                            <a href="{% url 'candidat_detail' c.pk %}" class="badge badge-placed" style="text-decoration: none; color: white;">Examiner</a>
-                            <a href="{% url 'candidat_approve' c.pk %}" class="badge badge-available" style="text-decoration: none; color: white; background: var(--success);">Approuver</a>
+                            <a href="{% url 'candidat_detail' c.pk %}" class="badge badge-placed" style="text-decoration: none;">Détails</a>
+                            <a href="{% url 'candidat_approve' c.pk %}" class="badge badge-available" style="text-decoration: none;">Approuver</a>
                         </div>
                     </td>
                 </tr>

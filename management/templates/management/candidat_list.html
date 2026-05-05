@@ -94,7 +94,7 @@
             </thead>
             <tbody>
                 {% for c in candidats %}
-                <tr class="candidat-row">
+                <tr class="candidat-row" data-zone="{{ c.adresse|lower }}" data-dispo="{{ c.get_disponibilite_display|lower }}">
                     <td><input type="checkbox" name="selected_ids" value="{{ c.pk }}" class="candidat-checkbox"></td>
                     <td style="font-weight: 700;">{{ c.matricule }}</td>
                     <td>
@@ -174,12 +174,14 @@
 
         document.querySelectorAll('.candidat-row').forEach(row => {
             const text = row.innerText.toLowerCase();
+            const zoneData = row.getAttribute('data-zone') || '';
+            const dispoData = row.getAttribute('data-dispo') || '';
             
             // On vérifie chaque critère
             const matchText = text.includes(query);
             const matchPoste = !poste || text.includes(poste);
-            const matchZone = !zone || text.includes(zone);
-            const matchDispo = !dispo || text.includes(dispo);
+            const matchZone = !zone || zoneData.includes(zone);
+            const matchDispo = !dispo || dispoData.includes(dispo);
             const matchStatut = !statut || text.includes(statut);
 
             if (matchText && matchPoste && matchZone && matchDispo && matchStatut) {

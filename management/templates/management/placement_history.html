@@ -17,7 +17,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for p in history %}
+            {% for p in placements %}
             <tr>
                 <td><strong>{{ p.candidat.nom }} {{ p.candidat.prenom }}</strong></td>
                 <td>{{ p.client.nom }}</td>
@@ -36,7 +36,15 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{% url 'placement_print' p.pk %}" target="_blank" style="color: #475569; font-weight: 600; text-decoration: none;">📄 Revoir Contrat</a>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="{% url 'placement_print' p.pk %}" target="_blank" style="color: #475569; font-weight: 600; text-decoration: none;">📄 Revoir Contrat</a>
+                        <button class="btn delete-placement-btn" 
+                                data-url="{% url 'placement_delete' p.pk %}"
+                                data-name="{{ p.candidat.nom|escapejs }} {{ p.candidat.prenom|escapejs }}"
+                                style="background: #fee2e2; color: #dc2626; padding: 5px 10px; font-size: 0.8rem; border: none; cursor: pointer; border-radius: 4px;">
+                            Supprimer
+                        </button>
+                    </div>
                 </td>
             </tr>
             {% empty %}
@@ -49,6 +57,31 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.querySelectorAll('.delete-placement-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const url = this.getAttribute('data-url');
+        const name = this.getAttribute('data-name');
+        
+        Swal.fire({
+            title: 'Supprimer ce placement ?',
+            text: "Voulez-vous vraiment supprimer définitivement le record de placement pour " + name + " ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    });
+});
+</script>
+
 
 <div style="margin-top: 2rem;">
     <a href="{% url 'placement_list' %}" class="btn" style="background: var(--text-muted); color: #fff; text-decoration: none;">Retour aux missions en cours</a>

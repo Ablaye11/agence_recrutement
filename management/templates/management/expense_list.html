@@ -20,6 +20,7 @@
                 <th>Titre / Objet</th>
                 <th>Catégorie</th>
                 <th>Montant</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -29,10 +30,18 @@
                 <td style="font-weight: 600;">{{ e.titre }}</td>
                 <td><span class="badge" style="background: #f1f5f9; color: #475569;">{{ e.get_categorie_display }}</span></td>
                 <td style="font-weight: 700; color: #dc2626;">- {{ e.montant }} FCFA</td>
+                <td>
+                    <button class="btn delete-expense-btn" 
+                            data-url="{% url 'expense_delete' e.pk %}"
+                            data-title="{{ e.titre|escapejs }}"
+                            style="background: #fee2e2; color: #dc2626; padding: 5px 10px; font-size: 0.8rem;">
+                        Supprimer
+                    </button>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
                     Aucune dépense enregistrée.
                 </td>
             </tr>
@@ -40,4 +49,29 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const url = this.getAttribute('data-url');
+        const title = this.getAttribute('data-title');
+        
+        Swal.fire({
+            title: 'Supprimer cette dépense ?',
+            text: "Voulez-vous vraiment supprimer la dépense : " + title + " ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
+
