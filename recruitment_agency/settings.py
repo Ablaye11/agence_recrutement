@@ -18,11 +18,22 @@ from decouple import Config, RepositoryEnv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Force python-decouple à lire le .env situé à la racine du projet
-env_path = BASE_DIR / '.env'
-if env_path.exists():
-    config = Config(RepositoryEnv(env_path))
-else:
-    from decouple import config
+try:
+    from decouple import Config, RepositoryEnv
+    env_path = BASE_DIR / '.env'
+    if env_path.exists():
+        config = Config(RepositoryEnv(str(env_path)))
+    else:
+        from decouple import config
+except ImportError:
+    # Fonction de secours si python-decouple n'est pas installé dans l'environnement
+    def config(option, default=None, cast=None):
+        val = os.getenv(option, default)
+        if cast == bool and isinstance(val, str):
+            return val.lower() in ('true', '1', 'yes', 'y', 't')
+        if cast and val is not None:
+            return cast(val)
+        return val
 
 
 # Quick-start development settings - unsuitable for production
