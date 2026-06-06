@@ -12,19 +12,27 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import Config, RepositoryEnv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Force python-decouple à lire le .env situé à la racine du projet
+env_path = BASE_DIR / '.env'
+if env_path.exists():
+    config = Config(RepositoryEnv(env_path))
+else:
+    from decouple import config
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'rudd6c&0-77-ycs)+uqc=(+)s0ci!#))wwogru!_(zqp0bo-(4'
+SECRET_KEY = config('SECRET_KEY', default='rudd6c&0-77-ycs)+uqc=(+)s0ci!#))wwogru!_(zqp0bo-(4')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['dakarterminus.com', 'www.dakarterminus.com', 'localhost', '127.0.0.1']
 
@@ -151,8 +159,13 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'suturasac@gmail.com'
-EMAIL_HOST_PASSWORD = 'qwmdqnzrlplbupgo'
-DEFAULT_FROM_EMAIL = 'Dakar Terminus <suturasac@gmail.com>'
-ADMIN_EMAIL = 'suturasac@gmail.com'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='suturasac@gmail.com')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = f'Dakar Terminus <{EMAIL_HOST_USER}>'
+ADMIN_EMAIL = config('ADMIN_EMAIL', default='suturasac@gmail.com')
+
+# PayTech Configuration
+PAYTECH_API_KEY = config('PAYTECH_API_KEY', default='')
+PAYTECH_API_SECRET = config('PAYTECH_API_SECRET', default='')
+PAYTECH_ENV = config('PAYTECH_ENV', default='test')
 
