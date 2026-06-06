@@ -8,48 +8,227 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #f8fafc; padding: 20px; }
-        .public-container { max-width: 700px; margin: 40px auto; background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .header { text-align: center; margin-bottom: 30px; }
-        .logo { font-size: 24px; font-weight: 800; color: #2563eb; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-control { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 1rem; }
-        .btn-submit { width: 100%; padding: 15px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .btn-submit:hover { background: #1d4ed8; transform: translateY(-2px); }
+        body { 
+            background: #f1f5f9; 
+            padding: 20px; 
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+        .public-container { 
+            max-width: 1100px; 
+            margin: 40px auto; 
+            background: #fff; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            overflow: hidden;
+        }
+        
+        /* Section Avantages (Gauche) */
+        .benefits-sidebar {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff;
+            padding: 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .benefits-sidebar h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            line-height: 1.3;
+            color: #ffffff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .benefit-badge {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-weight: 700;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.95rem;
+        }
+        .benefit-text h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            color: #ffffff;
+        }
+        .benefit-text p {
+            font-size: 0.95rem;
+            color: #e0f2fe;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Section Formulaire (Droite) */
+        .form-section {
+            padding: 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .header { 
+            margin-bottom: 30px; 
+        }
+        .logo { 
+            font-size: 26px; 
+            font-weight: 900; 
+            color: #2563eb; 
+            letter-spacing: -0.5px;
+        }
+        .form-group { 
+            margin-bottom: 1.25rem; 
+        }
+        .form-group label {
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #475569;
+            font-size: 0.9rem;
+        }
+        .form-control, input, select, textarea { 
+            width: 100%; 
+            padding: 12px 16px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 12px; 
+            font-size: 0.95rem;
+            transition: 0.2s;
+            box-sizing: border-box;
+        }
+        .form-control:focus, input:focus, select:focus, textarea:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .btn-submit { 
+            width: 100%; 
+            padding: 16px; 
+            background: #2563eb; 
+            color: #fff; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: 0.2s; 
+            margin-top: 10px;
+        }
+        .btn-submit:hover { 
+            background: #1d4ed8; 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .public-container {
+                grid-template-columns: 1fr;
+                margin: 10px auto;
+                border-radius: 16px;
+            }
+            .benefits-sidebar {
+                padding: 30px 20px;
+            }
+            .form-section {
+                padding: 30px 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="public-container">
-        <div class="header">
-            <div class="logo">DAKAR TERMINUS</div>
-            <h1 style="margin-top: 10px; font-size: 1.5rem; color: #1e293b;">Inscription Candidate</h1>
-            <p style="color: #64748b;">Veuillez remplir ce formulaire pour rejoindre notre agence.</p>
-        </div>
-        {% if messages %}
-    {% for message in messages %}
-        <div style="padding: 15px; background: #fee2e2; color: #dc2626; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 600;">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
-
-
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                {% for field in form %}
-                <div class="form-group {% if field.name == 'experience' or field.name == 'adresse' %}full-width{% endif %}">
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #475569;">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                    <p style="color: #dc2626; font-size: 0.8rem; margin-top: 5px;">{{ field.errors.0 }}</p>
-                    {% endif %}
+        <!-- Section Arguments de Vente -->
+        <div class="benefits-sidebar">
+            <h2>🔥 Pourquoi s’inscrire maintenant ?</h2>
+            
+            <div class="benefit-item">
+                <div class="benefit-badge">1</div>
+                <div class="benefit-text">
+                    <h3>Accès immédiat aux offres d’emploi</h3>
+                    <p>En t'inscrivant, tu accèdes directement à des missions disponibles à Dakar (ménage, nounou, cuisine, gardiennage, etc.).</p>
                 </div>
-                {% endfor %}
             </div>
 
-            <button type="submit" class="btn-submit">Envoyer ma candidature</button>
-        </form>
+            <div class="benefit-item">
+                <div class="benefit-badge">2</div>
+                <div class="benefit-text">
+                    <h3>Ajout dans notre groupe WhatsApp privé 📲</h3>
+                    <p>Tous les membres inscrits sont ajoutés dans notre groupe WhatsApp, où nous publions chaque jour les nouvelles offres d'emploi disponibles à l'agence.</p>
+                </div>
+            </div>
+
+            <div class="benefit-item">
+                <div class="benefit-badge">3</div>
+                <div class="benefit-text">
+                    <h3>Plus de chances d’être recruté</h3>
+                    <p>Les candidats inscrits sont prioritaires auprès des employeurs → tu passes avant les autres.</p>
+                </div>
+            </div>
+
+            <div class="benefit-item">
+                <div class="benefit-badge">4</div>
+                <div class="benefit-text">
+                    <h3>Mise en relation avec des clients fiables</h3>
+                    <p>Nous travaillons uniquement avec des clients sérieux et vérifiés, pour ta sécurité et ton respect.</p>
+                </div>
+            </div>
+
+            <div class="benefit-item">
+                <div class="benefit-badge">5</div>
+                <div class="benefit-text">
+                    <h3>Gain de temps et accompagnement</h3>
+                    <p>Plus besoin de chercher partout : nous t’envoyons les opportunités + un suivi personnalisé pour te placer rapidement. 🚀</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Inscription -->
+        <div class="form-section">
+            <div class="header">
+                <div class="logo">DAKAR TERMINUS</div>
+                <h1 style="margin-top: 10px; font-size: 1.5rem; color: #1e293b; font-weight: 700;">Inscription Candidate</h1>
+                <p style="color: #64748b; font-size: 0.95rem;">Veuillez remplir ce formulaire pour rejoindre l'agence.</p>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="padding: 15px; background: #fee2e2; color: #dc2626; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: 600; font-size: 0.95rem;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    {% for field in form %}
+                    <div class="form-group {% if field.name == 'experience' or field.name == 'adresse' or field.name == 'commentaire' %}full-width{% endif %}" style="{% if field.name == 'experience' or field.name == 'adresse' or field.name == 'commentaire' %}grid-column: span 2;{% endif %}">
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <p style="color: #dc2626; font-size: 0.8rem; margin-top: 5px;">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn-submit">S'inscrire et Payer les frais (5000 FCFA)</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
