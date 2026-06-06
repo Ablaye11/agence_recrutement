@@ -16,7 +16,14 @@
     <div class="success-card">
         <div class="icon">✓</div>
         <h1 style="color: #1e293b; margin-bottom: 10px;">Inscription Réussie !</h1>
-        <p style="color: #64748b; line-height: 1.6;">Merci pour votre inscription. Votre dossier a été transmis à nos services. Nous vous contacterons très prochainement pour un entretien.</p>
+        <p style="color: #64748b; line-height: 1.6;">
+        {% if message %}
+            {{ message }}
+        {% else %}
+        Merci pour votre inscription. Votre dossier a été transmis à nos services. Nous vous contacterons très prochainement pour un entretien.
+        {% endif %}
+    </p>
+
         <a href="{% url 'public_register' %}" style="display: inline-block; margin-top: 30px; color: #2563eb; text-decoration: none; font-weight: 600;">Retour à l'accueil</a>
     </div>
 </body>

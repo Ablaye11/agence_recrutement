@@ -25,6 +25,14 @@
             <h1 style="margin-top: 10px; font-size: 1.5rem; color: #1e293b;">Inscription Candidate</h1>
             <p style="color: #64748b;">Veuillez remplir ce formulaire pour rejoindre notre agence.</p>
         </div>
+        {% if messages %}
+    {% for message in messages %}
+        <div style="padding: 15px; background: #fee2e2; color: #dc2626; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: 600;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}

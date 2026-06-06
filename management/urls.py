@@ -26,7 +26,7 @@ urlpatterns = [
     path('notifications/', views.notification_center, name='notification_center'),
     path('notifications/read/<int:pk>/', views.mark_notification_as_read, name='mark_notification_as_read'),
     path('notifications/read-all/', views.mark_all_notifications_as_read, name='mark_all_notifications_as_read'),
-    
+
     path('clients/', views.client_list, name='client_list'),
     path('client/nouveau/', views.client_create, name='client_create'),
     path('rapports/', views.finance_reports, name='finance_reports'),
@@ -52,4 +52,9 @@ urlpatterns = [
     path('commande-client/refuser/<int:pk>/', views.client_request_refuse, name='client_request_refuse'),
     path('commande-client/supprimer/<int:pk>/', views.client_request_delete, name='client_request_delete'),
     path('demande-personnel/', views.client_public_request, name='client_public_request'),
+        # Paiement PayTech
+    path('payment/success/', views.payment_success, name='payment_success'),
+    path('payment/cancel/', views.payment_cancel, name='payment_cancel'),
+    path('payment/ipn/', views.payment_ipn, name='payment_ipn'),
+
 ]

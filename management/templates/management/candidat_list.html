@@ -6,7 +6,7 @@
 {% block content %}
 <form id="bulk-form" method="post" action="{% url 'candidat_bulk_action' %}">
     {% csrf_token %}
-    
+
     <div class="card" style="margin-bottom: 2rem;">
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
             <!-- Recherche texte -->
@@ -36,12 +36,10 @@
             <div style="flex: 1; min-width: 150px;">
                 <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Disponibilité</label>
                 <select id="filter-dispo" class="form-control">
-                    <option value="">Toutes</option>
-                    <option value="Descente chaque semaine">Descente chaque semaine</option>
-                    <option value="Journalier">Journalier</option>
-                    <option value="Descend chaque 15 jours">Chaque 15 jours</option>
-                    <option value="Logée">Logée</option>
-                    <option value="Non logée">Non logée</option>
+                     <option value="">Toutes</option>
+                        {% for key, value in dispo_choices %}
+                     <option value="{{ value|lower }}">{{ value }}</option>
+                        {% endfor %}
                 </select>
             </div>
 
@@ -92,9 +90,14 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="candidat-tbody">
                 {% for c in candidats %}
-                <tr class="candidat-row" data-zone="{{ c.adresse|lower }}" data-dispo="{{ c.get_disponibilite_display|lower }}">
+                <tr class="candidat-row"
+                    data-search="{{ c.nom }} {{ c.prenom }} {{ c.telephone }} {{ c.matricule }}"
+                    data-poste="{{ c.get_poste_recherche_display|lower }}"
+                    data-zone="{{ c.adresse|lower }}"
+                    data-dispo="{{ c.get_disponibilite_display|lower }}"
+                    data-statut="{{ c.get_statut_display|lower }}">
                     <td><input type="checkbox" name="selected_ids" value="{{ c.pk }}" class="candidat-checkbox"></td>
                     <td style="font-weight: 700;">{{ c.matricule }}</td>
                     <td>
@@ -115,13 +118,15 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div id="no-results" style="display: none; text-align: center; padding: 3rem; color: var(--text-muted);">
+            🔍 Aucun candidat ne correspond à vos critères de recherche.
+        </div>
     </div>
 </form>
 
 <script>
     // Sélection massive
     const selectAll = document.getElementById('select-all');
-    const checkboxes = document.querySelectorAll('.candidat-checkbox');
     const bulkBar = document.getElementById('bulk-actions-bar');
     const countSpan = document.getElementById('selected-count');
 
@@ -131,13 +136,18 @@
         bulkBar.style.display = checked.length > 0 ? 'flex' : 'none';
     }
 
-    selectAll.addEventListener('change', (e) => {
-        checkboxes.forEach(cb => cb.checked = e.target.checked);
-        updateBulkBar();
-    });
+    if (selectAll) {
+        selectAll.addEventListener('change', (e) => {
+            const visibleCheckboxes = document.querySelectorAll('.candidat-row:not([style*="display: none"]) .candidat-checkbox');
+            visibleCheckboxes.forEach(cb => cb.checked = e.target.checked);
+            updateBulkBar();
+        });
+    }
 
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', updateBulkBar);
+    document.addEventListener('change', (e) => {
+        if (e.target.classList.contains('candidat-checkbox')) {
+            updateBulkBar();
+        }
     });
 
     function confirmBulkAction() {
@@ -164,32 +174,40 @@
     const filterZone = document.getElementById('filter-zone');
     const filterDispo = document.getElementById('filter-dispo');
     const filterStatut = document.getElementById('filter-statut');
+    const noResults = document.getElementById('no-results');
+    const rows = document.querySelectorAll('.candidat-row');
 
     function applyFilters() {
-        const query = searchInput.value.toLowerCase();
+        const query = searchInput.value.toLowerCase().trim();
         const poste = filterPoste.value.toLowerCase();
         const zone = filterZone.value.toLowerCase();
         const dispo = filterDispo.value.toLowerCase();
         const statut = filterStatut.value.toLowerCase();
 
-        document.querySelectorAll('.candidat-row').forEach(row => {
-            const text = row.innerText.toLowerCase();
-            const zoneData = row.getAttribute('data-zone') || '';
-            const dispoData = row.getAttribute('data-dispo') || '';
-            
-            // On vérifie chaque critère
-            const matchText = text.includes(query);
-            const matchPoste = !poste || text.includes(poste);
-            const matchZone = !zone || zoneData.includes(zone);
-            const matchDispo = !dispo || dispoData.includes(dispo);
-            const matchStatut = !statut || text.includes(statut);
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const rowSearch = row.getAttribute('data-search').toLowerCase();
+            const rowPoste = row.getAttribute('data-poste');
+            const rowZone = row.getAttribute('data-zone');
+            const rowDispo = row.getAttribute('data-dispo');
+            const rowStatut = row.getAttribute('data-statut');
+
+            const matchText = !query || rowSearch.includes(query);
+            const matchPoste = !poste || rowPoste === poste || rowPoste.includes(poste);
+            const matchZone = !zone || rowZone.includes(zone);
+            const matchDispo = !dispo || rowDispo === dispo;
+            const matchStatut = !statut || rowStatut === statut;
 
             if (matchText && matchPoste && matchZone && matchDispo && matchStatut) {
                 row.style.display = '';
+                visibleCount++;
             } else {
                 row.style.display = 'none';
             }
         });
+
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
     }
 
     [searchInput, filterPoste, filterZone, filterDispo, filterStatut].forEach(el => {

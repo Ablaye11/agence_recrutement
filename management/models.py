@@ -32,11 +32,17 @@ class Candidat(models.Model):
         ('ASSISTANTE', 'Assistante'),
         ('PLONGE', 'Plongé Restaurant'),
         ('LINGERE', 'Lingère et repassage'),
+        ('CUISINE_NETTOYAGE', 'Cuisine et nettoyage'),
+        ('NOUNOU_NETTOYAGE', 'Nounou et nettoyage'),
+        ('CUISINE_NOUNOU', 'Cuisine et nounou'),
+        ('NETTOYAGE_SIMPLE', 'Nettoyage'),
+        ('SOCIETE_DE_NETTOYAGE_DAKAR_TERMINUS', 'Societe de nettoyage Dakar Terminus'),
         ('AUTRE', 'Autre.....'),
     ]
 
     DISPO_CHOICES = [
         ('JOURNALIER', 'Journalier'),
+        ('DAILY', 'Descend chaque jour'),
         ('WEEKLY', 'Descente chaque semaine'),
         ('BI_WEEKLY', 'Descend chaque 15 jours'),
         ('LIVE_IN', 'Logée'),
@@ -48,12 +54,15 @@ class Candidat(models.Model):
         ('PLACED', 'Placé'),
         ('WAITING', 'En attente'),
         ('REFUSED', 'Refusé'),
+        ('PAYMENT_PENDING', 'En attente de paiement'),
     ]
 
     matricule = models.CharField(max_length=20, unique=True, editable=False)
-    photo = models.ImageField(upload_to='candidats/', null=True, blank=True)
-    piece_identite = models.FileField(upload_to='documents/cni/', null=True, blank=True, verbose_name="Carte d'Identité (PDF/Image)")
-    certificat_medical = models.FileField(upload_to='documents/sante/', null=True, blank=True, verbose_name="Certificat Médical")
+    photo = models.ImageField(upload_to='candidats/')
+    # Modification ici : retrait de null=True et blank=True pour rendre la CNI obligatoire
+    piece_identite = models.FileField(upload_to='documents/cni/', verbose_name="Carte d'Identité (PDF/Image)")
+    # Modification ici : renommé en certificat_residence et changement du nom affiché
+    certificat_residence = models.FileField(upload_to='documents/residence/', null=True, blank=True, verbose_name="Certificat de Résidence")
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
     age = models.PositiveIntegerField()
@@ -63,6 +72,8 @@ class Candidat(models.Model):
     experience = models.TextField()
     disponibilite = models.CharField(max_length=50, choices=DISPO_CHOICES)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='AVAILABLE', db_index=True)
+    frais_paye = models.BooleanField(default=False, verbose_name="Frais de dossier payés")
+    transaction_id = models.CharField(max_length=100, blank=True, null=True, verbose_name="ID Transaction Paiement")
     commentaire = models.TextField(blank=True, null=True, verbose_name="Commentaire (Candidat)")
     observations = models.TextField(blank=True, verbose_name="Observations (Admin)")
     date_inscription = models.DateTimeField(auto_now_add=True, db_index=True)

@@ -14,13 +14,13 @@
             {{ candidat.nom|slice:":1" }}
         </div>
         {% endif %}
-        
+
         <h2 style="margin-bottom: 0.5rem;">{{ candidat.nom }} {{ candidat.prenom }}</h2>
         <p style="color: var(--text-muted); font-weight: 600; margin-bottom: 1rem;">{{ candidat.matricule }}</p>
         <span class="badge badge-{{ candidat.statut|lower }}" style="font-size: 1rem; padding: 0.5rem 1.5rem; display: inline-block; margin-bottom: 2rem;">
             {{ candidat.get_statut_display }}
         </span>
-        
+
         <div style="text-align: left; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
             <h4 style="margin-bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Documents Numérisés</h4>
             <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
@@ -32,13 +32,14 @@
                 <div style="padding: 0.75rem; background: #f8fafc; color: #94a3b8; border-radius: 0.75rem; font-size: 0.9rem; border: 1px dashed #cbd5e1;">❌ CNI Non fournie</div>
                 {% endif %}
 
-                {% if candidat.certificat_medical %}
-                <a href="{{ candidat.certificat_medical.url }}" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 0.75rem; background: #ecfdf5; color: #059669; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
-                    <span>🏥</span> Certificat Médical
-                </a>
-                {% else %}
-                <div style="padding: 0.75rem; background: #f8fafc; color: #94a3b8; border-radius: 0.75rem; font-size: 0.9rem; border: 1px dashed #cbd5e1;">❌ Santé Non fournie</div>
-                {% endif %}
+                {% if candidat.certificat_residence %}
+<a href="{{ candidat.certificat_residence.url }}" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 0.75rem; background: #ecfdf5; color: #059669; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+    <span>🏠</span> Certificat de Résidence
+</a>
+{% else %}
+<div style="padding: 0.75rem; background: #f8fafc; color: #94a3b8; border-radius: 0.75rem; font-size: 0.9rem; border: 1px dashed #cbd5e1;">❌ Résidence Non fournie</div>
+{% endif %}
+
             </div>
 
             <p style="margin-bottom: 0.75rem;"><strong>Âge :</strong> {{ candidat.age }} ans</p>
@@ -79,18 +80,18 @@
                 {% endif %}
             </div>
         </div>
-        
+
         <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
             {% if candidat.statut == 'WAITING' %}
             <a href="{% url 'candidat_approve' candidat.pk %}" class="btn" style="background: var(--success); color: #fff; text-decoration: none; font-weight: 700;">✅ Approuver et Activer le profil</a>
             {% endif %}
-            
+
             <a href="{% url 'candidat_edit' candidat.pk %}" class="btn btn-primary" style="text-decoration: none;">Modifier le profil</a>
             {% if candidat.statut != 'PLACED' %}
             <a href="{% url 'placement_create' %}?candidat={{ candidat.pk }}" class="btn" style="background: var(--success); color: #fff; text-decoration: none;">Placer ce candidat</a>
             {% endif %}
-            
-            <a href="javascript:void(0)" 
+
+            <a href="javascript:void(0)"
                id="delete-btn"
                data-url="{% url 'candidat_delete' candidat.pk %}"
                data-name="{{ candidat.nom|escapejs }} {{ candidat.prenom|escapejs }}"
@@ -107,7 +108,7 @@
 document.getElementById('delete-btn').addEventListener('click', function() {
     const url = this.getAttribute('data-url');
     const name = this.getAttribute('data-name');
-    
+
     Swal.fire({
         title: 'Supprimer ce candidat ?',
         text: "Vous allez supprimer définitivement le dossier de " + name + ". Cette action est irréversible !",

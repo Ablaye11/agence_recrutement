@@ -4,11 +4,11 @@ from .models import Candidat, Client, Placement, ClientRequest
 class CandidatForm(forms.ModelForm):
     class Meta:
         model = Candidat
-        fields = ['photo', 'piece_identite', 'certificat_medical', 'nom', 'prenom', 'age', 'telephone', 'adresse', 'poste_recherche', 'experience', 'disponibilite', 'statut', 'commentaire', 'observations']
+        fields = ['photo', 'piece_identite', 'certificat_residence', 'nom', 'prenom', 'age', 'telephone', 'adresse', 'poste_recherche', 'experience', 'disponibilite', 'statut', 'commentaire', 'observations']
         widgets = {
             'photo': forms.FileInput(attrs={'class': 'form-control'}),
             'piece_identite': forms.FileInput(attrs={'class': 'form-control'}),
-            'certificat_medical': forms.FileInput(attrs={'class': 'form-control'}),
+            'certificat_residence': forms.FileInput(attrs={'class': 'form-control'}),
             'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom de famille', 'required': 'required'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénoms', 'required': 'required'}),
             'age': forms.NumberInput(attrs={'class': 'form-control', 'required': 'required'}),
@@ -50,8 +50,11 @@ class PlacementForm(forms.ModelForm):
 class RegistrationForm(forms.ModelForm):
     class Meta:
         model = Candidat
-        fields = ['nom', 'prenom', 'age', 'telephone', 'adresse', 'poste_recherche', 'experience', 'disponibilite', 'commentaire']
+        fields = ['photo', 'piece_identite', 'certificat_residence', 'nom', 'prenom', 'age', 'telephone', 'adresse', 'poste_recherche', 'experience', 'disponibilite', 'commentaire']
         widgets = {
+            'photo': forms.FileInput(attrs={'class': 'form-control'}),
+            'piece_identite': forms.FileInput(attrs={'class': 'form-control'}),
+            'certificat_residence': forms.FileInput(attrs={'class': 'form-control'}),
             'nom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom', 'required': 'required'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénom', 'required': 'required'}),
             'age': forms.NumberInput(attrs={'class': 'form-control', 'required': 'required'}),

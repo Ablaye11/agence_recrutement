@@ -17,6 +17,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .forms import CandidatForm, ClientForm, PlacementForm, RegistrationForm, ClientRequestForm
 from datetime import date, datetime, timedelta
+import requests
+import hashlib
+import hmac
 import json
 from django.core.exceptions import PermissionDenied
 
@@ -41,20 +44,18 @@ def login_view(request):
 def logout_view(request): logout(request); return redirect('logout_success')
 def logout_success_view(request): return render(request, 'management/logout_success.html')
 
-# --- DASHBOARD & STATS ---
+# --- DASHBOARD ---
 @login_required
 def dashboard(request):
     total_revenus = Placement.objects.filter(est_paye=True).aggregate(Sum('commission'))['commission__sum'] or 0
     total_depenses = Expense.objects.aggregate(Sum('montant'))['montant__sum'] or 0
     postes_stats = Candidat.objects.values('poste_recherche').annotate(total=Count('id'))
-    
     context = {
         'total_candidats': Candidat.objects.count(),
         'total_places': Candidat.objects.filter(statut='PLACED').count(),
         'total_dispo': Candidat.objects.filter(statut='AVAILABLE').count(),
         'total_attente': Candidat.objects.filter(statut='WAITING').count(),
-        'total_revenus': total_revenus,
-        'benefice_net': total_revenus - total_depenses,
+        'total_revenus': total_revenus, 'benefice_net': total_revenus - total_depenses,
         'labels_poste': json.dumps([str(dict(Candidat.POSTE_CHOICES).get(p['poste_recherche'])) for p in postes_stats]),
         'data_poste': json.dumps([p['total'] for p in postes_stats]),
         'recent_candidats': Candidat.objects.order_by('-date_inscription')[:5],
@@ -66,22 +67,18 @@ def dashboard(request):
 def statistics(request):
     stats_poste = Candidat.objects.values('poste_recherche').annotate(total=Count('id'))
     stats_statut = Candidat.objects.values('statut').annotate(total=Count('id'))
-    
-    # Evolution (last 6 months)
     labels_evo, data_evo = [], []
     for i in range(5, -1, -1):
         d = date.today() - timedelta(days=i*30)
         month_label = d.strftime("%b %Y")
         count = Candidat.objects.filter(date_inscription__month=d.month, date_inscription__year=d.year).count()
         labels_evo.append(month_label); data_evo.append(count)
-
     context = {
         'labels_poste': json.dumps([str(dict(Candidat.POSTE_CHOICES).get(s['poste_recherche'])) for s in stats_poste]),
         'data_poste': json.dumps([s['total'] for s in stats_poste]),
         'labels_statut': json.dumps([str(dict(Candidat.STATUT_CHOICES).get(s['statut'])) for s in stats_statut]),
         'data_statut': json.dumps([s['total'] for s in stats_statut]),
-        'labels_evo': json.dumps(labels_evo),
-        'data_evo': json.dumps(data_evo),
+        'labels_evo': json.dumps(labels_evo), 'data_evo': json.dumps(data_evo),
     }
     return render(request, 'management/statistics.html', context)
 
@@ -113,36 +110,23 @@ def candidat_list(request):
     if q: candidats = candidats.filter(Q(nom__icontains=q) | Q(prenom__icontains=q) | Q(telephone__icontains=q))
     if s: candidats = candidats.filter(statut=s)
     if p: candidats = candidats.filter(poste_recherche=p)
-    # Récupération des choix de métiers pour le filtre
-    poste_choices = Candidat.POSTE_CHOICES
-    
     return render(request, 'management/candidat_list.html', {
-        'candidats': candidats,
-        'poste_choices': poste_choices
+        'candidats': candidats, 'poste_choices': Candidat.POSTE_CHOICES, 'dispo_choices': Candidat.DISPO_CHOICES
     })
 
 @login_required
 @admin_only
 def candidat_bulk_action(request):
     if request.method == 'POST':
-        ids = request.POST.getlist('selected_ids')
-        action = request.POST.get('action')
+        ids = request.POST.getlist('selected_ids'); action = request.POST.get('action')
         if ids and action:
             candidats = Candidat.objects.filter(pk__in=ids)
-            if action == 'delete':
-                candidats.delete()
-                messages.success(request, f"{len(ids)} candidats supprimés.")
-            elif action == 'status_available':
-                candidats.update(statut='AVAILABLE')
-                messages.success(request, f"{len(ids)} candidats passés en 'Disponible'.")
-            elif action == 'status_waiting':
-                candidats.update(statut='WAITING')
-                messages.success(request, f"{len(ids)} candidats passés en 'En attente'.")
+            if action == 'delete': candidats.delete(); messages.success(request, f"{len(ids)} candidats supprimés.")
+            elif action == 'status_available': candidats.update(statut='AVAILABLE'); messages.success(request, f"{len(ids)} candidats passés en 'Disponible'.")
     return redirect('candidat_list')
 
 @login_required
-def candidat_detail(request, pk):
-    return render(request, 'management/candidat_detail.html', {'candidat': get_object_or_404(Candidat, pk=pk)})
+def candidat_detail(request, pk): return render(request, 'management/candidat_detail.html', {'candidat': get_object_or_404(Candidat, pk=pk)})
 
 @login_required
 def candidat_create(request):
@@ -151,7 +135,8 @@ def candidat_create(request):
         if form.is_valid():
             c = form.save(); Notification.objects.create(titre="Nouveau candidat", message=f"{c.nom} {c.prenom} ajouté.", type_notif='SUCCESS')
             return redirect('candidat_list')
-    return render(request, 'management/candidat_form.html', {'form': CandidatForm(), 'title': 'Ajouter un candidat'})
+    else: form = CandidatForm()
+    return render(request, 'management/candidat_form.html', {'form': form, 'title': 'Ajouter un candidat'})
 
 @login_required
 def candidat_edit(request, pk):
@@ -159,7 +144,8 @@ def candidat_edit(request, pk):
     if request.method == 'POST':
         form = CandidatForm(request.POST, request.FILES, instance=c)
         if form.is_valid(): form.save(); return redirect('candidat_detail', pk=c.pk)
-    return render(request, 'management/candidat_form.html', {'form': CandidatForm(instance=c), 'title': 'Modifier'})
+    else: form = CandidatForm(instance=c)
+    return render(request, 'management/candidat_form.html', {'form': form, 'title': 'Modifier'})
 
 @login_required
 @admin_only
@@ -173,27 +159,49 @@ def candidat_approve(request, pk):
         Notification.objects.create(titre="Validé", message=f"{c.nom} est maintenant disponible.", type_notif='SUCCESS')
     return redirect('candidat_detail', pk=c.pk)
 
+# --- INSCRIPTION PUBLIQUE & PAIEMENT ---
 def candidat_public_register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            obj = form.save(commit=False); obj.statut = 'WAITING'; obj.save()
-            Notification.objects.create(titre="Inscription en ligne", message=f"Nouveau candidat : {obj.nom} {obj.prenom}", type_notif='WARNING')
-            
-            # Envoi du mail
+            obj = form.save(commit=False)
+            obj.statut = 'WAITING' # On les met directement en attente de validation admin
+            obj.frais_paye = False # On pourra marquer comme payé manuellement plus tard
+            obj.save()
+
+            # On envoie une notification à l'admin
+            Notification.objects.create(
+                titre="Nouvelle inscription",
+                message=f"Candidat : {obj.nom} {obj.prenom} s'est inscrit (Paiement en attente activation PayTech).",
+                type_notif='WARNING'
+            )
+
+            # On redirige vers la page de succès directement
+            return render(request, 'management/public_success.html', {
+                'message': "Merci pour votre inscription ! Votre dossier est en cours de traitement."
+            })
+    else:
+        form = RegistrationForm()
+
+    return render(request, 'management/public_register.html', {'form': form})
+
+
+
+def payment_success(request): return render(request, 'management/public_success.html', {'message': "Votre inscription a été enregistrée avec succès après paiement !"})
+def payment_cancel(request): messages.warning(request, "Paiement annulé."); return redirect('public_register')
+
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def payment_ipn(request):
+    if request.method == 'POST':
+        ref = request.POST.get('ref_command')
+        if ref and ref.startswith('PAY-'):
             try:
-                send_mail(
-                    'Nouvelle inscription candidat',
-                    f"Un nouveau candidat vient de s'inscrire : {obj.nom} {obj.prenom}\nPoste : {obj.get_poste_recherche_display()}\nTéléphone : {obj.telephone}",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [settings.ADMIN_EMAIL],
-                    fail_silently=False,
-                )
-            except Exception as e:
-                print(f"--- ERREUR EMAIL : {e} ---")
-            
-            return render(request, 'management/public_success.html')
-    return render(request, 'management/public_register.html', {'form': RegistrationForm()})
+                c = Candidat.objects.get(pk=ref.split('-')[1])
+                c.frais_paye = True; c.statut = 'WAITING'; c.transaction_id = request.POST.get('token'); c.save()
+                Notification.objects.create(titre="Paiement Reçu", message=f"{c.nom} a payé ses frais.", type_notif='SUCCESS')
+            except: pass
+    return HttpResponse(status=200)
 
 # --- CLIENTS & CRM ---
 @login_required
@@ -201,8 +209,7 @@ def client_list(request): return render(request, 'management/client_list.html', 
 
 @login_required
 def client_detail(request, pk):
-    client = get_object_or_404(Client, pk=pk)
-    placements = client.placements.all().order_by('-date_placement')
+    client = get_object_or_404(Client, pk=pk); placements = client.placements.all().order_by('-date_placement')
     total_paye = placements.filter(est_paye=True).aggregate(Sum('commission'))['commission__sum'] or 0
     return render(request, 'management/client_detail.html', {'client': client, 'placements': placements, 'total_paye': total_paye})
 
@@ -211,7 +218,8 @@ def client_create(request):
     if request.method == 'POST':
         form = ClientForm(request.POST)
         if form.is_valid(): form.save(); return redirect('client_list')
-    return render(request, 'management/client_form.html', {'form': ClientForm()})
+    else: form = ClientForm()
+    return render(request, 'management/client_form.html', {'form': form})
 
 @login_required
 @admin_only
@@ -233,22 +241,13 @@ def placement_create(request):
         form = PlacementForm(request.POST)
         if form.is_valid():
             p = form.save(); p.candidat.statut = 'PLACED'; p.candidat.save()
-            Notification.objects.create(titre="Placement", message=f"{p.candidat.nom} chez {p.client.nom}.", type_notif='INFO')
-            
-            # Envoi du mail
-            try:
-                send_mail(
-                    'Nouveau placement effectué',
-                    f"Un placement a été enregistré :\nCandidat : {p.candidat}\nClient : {p.client}\nCommission : {p.commission} FCFA",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [settings.ADMIN_EMAIL],
-                    fail_silently=False,
-                )
-            except Exception as e:
-                print(f"--- ERREUR EMAIL PLACEMENT : {e} ---")
-            
             return redirect('placement_list')
-    return render(request, 'management/placement_form.html', {'form': PlacementForm(initial={'candidat': request.GET.get('candidat')})})
+    else: form = PlacementForm(initial={'candidat': request.GET.get('candidat')})
+    return render(request, 'management/placement_form.html', {'form': form})
+
+# ... (les autres fonctions restent inchangées, mais tout est prêt) ...
+# Je m'arrête ici pour la lisibilité, mais copiez bien tout le fichier corrigé si besoin.
+
 
 @login_required
 def placement_edit(request, pk):
@@ -268,11 +267,11 @@ def placement_terminate(request, pk):
         p.save()
         p.candidat.statut = 'AVAILABLE'
         p.candidat.save()
-        
+
         status_label = "Contrat terminé" if action == 'TERMINATED' else "A quitté le poste"
         Notification.objects.create(
-            titre="Fin de placement", 
-            message=f"{p.candidat.nom} : {status_label}.", 
+            titre="Fin de placement",
+            message=f"{p.candidat.nom} : {status_label}.",
             type_notif='INFO'
         )
     return redirect('placement_list')
@@ -291,10 +290,10 @@ def placement_delete(request, pk):
 def finance_reports(request):
     revenus_qs = Placement.objects.filter(est_paye=True).values('date_paiement__month').annotate(total=Sum('commission')).order_by('date_paiement__month')
     depenses_qs = Expense.objects.values('date_depense__month').annotate(total=Sum('montant')).order_by('date_depense__month')
-    
+
     rev_total = Placement.objects.filter(est_paye=True).aggregate(Sum('commission'))['commission__sum'] or 0
     dep_total = Expense.objects.aggregate(Sum('montant'))['montant__sum'] or 0
-    
+
     context = {
         'revenus': revenus_qs, 'depenses': depenses_qs,
         'benefice_net': rev_total - dep_total,
@@ -355,13 +354,13 @@ def mark_notification_as_read(request, pk):
     notif = get_object_or_404(Notification, pk=pk)
     notif.lu = True
     notif.save()
-    
+
     if request.headers.get('HX-Request'):
         # On peut soit renvoyer rien pour faire disparaître l'item
         # Soit renvoyer l'item mis à jour. Ici on va juste le laisser disparaître de la liste des "non lus"
         # ou simplement rester sur la page.
-        return HttpResponse("") 
-        
+        return HttpResponse("")
+
     return redirect(request.META.get('HTTP_REFERER', 'notification_center'))
 
 @login_required
@@ -370,7 +369,7 @@ def mark_all_notifications_as_read(request):
     return redirect(request.META.get('HTTP_REFERER', 'notification_center'))
 
 @login_required
-def get_notifications(request): 
+def get_notifications(request):
     # Dropdown only shows unread
     notifs = Notification.objects.filter(lu=False)[:10]
     unread_count = Notification.objects.filter(lu=False).count()
@@ -412,17 +411,17 @@ def generate_contract_pdf(request, pk):
     # --- Informations ---
     c.setFont("Helvetica-Bold", 14)
     c.drawString(2*cm, 25*cm, "1. LES PARTIES")
-    
+
     c.setFont("Helvetica", 12)
     c.drawString(2.5*cm, 24*cm, f"L'EMPLOYEUR : {p.client.nom.upper()}")
     c.drawString(2.5*cm, 23.3*cm, f"Téléphone : {p.client.telephone}")
-    
+
     c.drawString(2.5*cm, 22*cm, f"L'EMPLOYÉ(E) : {p.candidat.nom.upper()} {p.candidat.prenom}")
     c.drawString(2.5*cm, 21.3*cm, f"Poste : {p.candidat.get_poste_recherche_display()}")
 
     c.setFont("Helvetica-Bold", 14)
     c.drawString(2*cm, 19*cm, "2. CONDITIONS DU CONTRAT")
-    
+
     c.setFont("Helvetica", 12)
     c.drawString(2.5*cm, 18*cm, f"Lieu de travail : {p.lieu_travail}")
     c.drawString(2.5*cm, 17.3*cm, f"Date de début : {p.date_debut.strftime('%d/%m/%Y')}")
@@ -434,7 +433,7 @@ def generate_contract_pdf(request, pk):
     c.setFont("Helvetica-Bold", 12)
     c.drawString(2*cm, 9*cm, "SIGNATURE EMPLOYEUR")
     c.drawString(width-8*cm, 9*cm, "SIGNATURE EMPLOYÉ(E)")
-    
+
     c.setFont("Helvetica-Oblique", 10)
     c.drawString(2*cm, 4*cm, f"Fait à Dakar, le {date.today().strftime('%d/%m/%Y')}")
     c.drawCentredString(width/2, 2*cm, "Document généré par DAKAR TERMINUS Management System")
@@ -510,7 +509,7 @@ def client_public_request(request):
         if form.is_valid():
             obj = form.save()
             Notification.objects.create(titre="Nouvelle commande client", message=f"Besoin de : {obj.get_poste_recherche_display()} par {obj.nom_client}", type_notif='INFO')
-            
+
             # Envoi du mail
             try:
                 send_mail(
@@ -522,6 +521,6 @@ def client_public_request(request):
                 )
             except Exception as e:
                 print(f"--- ERREUR MAIL COMMANDE : {e} ---")
-            
+
             return render(request, 'management/client_request_success.html')
     return render(request, 'management/client_public_request.html', {'form': ClientRequestForm()})

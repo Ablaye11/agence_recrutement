@@ -31,8 +31,18 @@
                     <td>{{ req.date_demande|date:"d/m/Y" }}</td>
                     <td>
                         <div style="display: flex; gap: 0.5rem;">
-                            <a href="{% url 'client_request_accept' req.pk %}" class="badge badge-available" style="text-decoration: none;">Accepter</a>
-                            <a href="{% url 'client_request_delete' req.pk %}" class="badge" style="background: #ef4444; color: white; text-decoration: none;" onclick="return confirm('Supprimer définitivement cette commande ?')">Supprimer</a>
+                            <button class="badge badge-available btn-restore" 
+                                    data-url="{% url 'client_request_accept' req.pk %}"
+                                    data-name="{{ req.nom_client|escapejs }}"
+                                    style="border: none; cursor: pointer; font-family: inherit;">
+                                Accepter
+                            </button>
+                            <button class="badge btn-delete" 
+                                    data-url="{% url 'client_request_delete' req.pk %}"
+                                    data-name="{{ req.nom_client|escapejs }}"
+                                    style="background: #fee2e2; color: #b91c1c; border: none; cursor: pointer; font-family: inherit;">
+                                Supprimer Définitivement
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -47,4 +57,48 @@
         </table>
     </div>
 </div>
+
+<script>
+document.querySelectorAll('.btn-restore').forEach(btn => {
+    btn.onclick = function() {
+        const url = this.dataset.url;
+        const name = this.dataset.name;
+        Swal.fire({
+            title: 'Accepter la commande ?',
+            text: `Voulez-vous transformer la demande de ${name} en client officiel ?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, accepter',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+});
+
+document.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.onclick = function() {
+        const url = this.dataset.url;
+        const name = this.dataset.name;
+        Swal.fire({
+            title: 'Suppression Définitive',
+            text: `Êtes-vous sûr de vouloir supprimer définitivement la commande de ${name} ? Cette action est irréversible.`,
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
