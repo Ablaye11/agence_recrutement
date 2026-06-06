@@ -161,28 +161,56 @@ def candidat_approve(request, pk):
 
 # --- INSCRIPTION PUBLIQUE & PAIEMENT ---
 def candidat_public_register(request):
+    # On définit form avec une valeur par défaut pour éviter l'erreur UnboundLocalError
+    form = RegistrationForm()
+
     if request.method == 'POST':
         form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.statut = 'WAITING' # On les met directement en attente de validation admin
-            obj.frais_paye = False # On pourra marquer comme payé manuellement plus tard
+            obj.statut = 'PAYMENT_PENDING'
             obj.save()
 
-            # On envoie une notification à l'admin
-            Notification.objects.create(
-                titre="Nouvelle inscription",
-                message=f"Candidat : {obj.nom} {obj.prenom} s'est inscrit (Paiement en attente activation PayTech).",
-                type_notif='WARNING'
-            )
+            # CONFIGURATION PAYTECH
+            API_KEY = "38164a2cfd7157b4b39c23beba78e7a2ec6b94ed0c53c4786945f8d9572b6112"
+            API_SECRET = "a1aae9bc18d4b6fe82faed22d4c0ee30eaf5dcdbed1c65fdc556a9e7540d693d"
 
-            # On redirige vers la page de succès directement
-            return render(request, 'management/public_success.html', {
-                'message': "Merci pour votre inscription ! Votre dossier est en cours de traitement."
-            })
-    else:
-        form = RegistrationForm()
+            payload = {
+                "item_name": "Frais de dossier - Dakar Terminus",
+                "item_price": "5000",
+                "currency": "XOF",
+                "ref_command": f"PAY-{obj.pk}-{datetime.now().strftime('%H%M%S')}",
+                "command_name": f"Paiement Inscription {obj.nom} {obj.prenom}",
+                "env": "test",
+                "ipn_url": request.build_absolute_uri('/payment/ipn/'),
+                "success_url": request.build_absolute_uri('/payment/success/'),
+                "cancel_url": request.build_absolute_uri('/payment/cancel/'),
+            }
 
+            headers = {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "API_KEY": API_KEY,
+                "API_SECRET": API_SECRET,
+            }
+
+            try:
+                response = requests.post(
+                    "https://paytech.sn/api/payment/request-payment",
+                    json=payload,
+                    headers=headers
+                )
+                res_data = response.json()
+                if res_data.get('success') == 1:
+                    return redirect(res_data['redirect_url'])
+                else:
+                    messages.error(request, f"Erreur PayTech: {res_data}")
+                    obj.delete()
+            except Exception as e:
+                messages.error(request, "Erreur de connexion au service de paiement.")
+                obj.delete()
+
+    # Cette ligne est alignée avec le premier "if"
     return render(request, 'management/public_register.html', {'form': form})
 
 
