@@ -212,7 +212,7 @@
                 {% endfor %}
             {% endif %}
 
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" onsubmit="var btn = document.querySelector('.btn-submit'); btn.innerText = 'Envoi des fichiers et redirection vers le paiement... ⏳'; btn.style.opacity = '0.7'; btn.style.cursor = 'not-allowed';">
                 {% csrf_token %}
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     {% for field in form %}
