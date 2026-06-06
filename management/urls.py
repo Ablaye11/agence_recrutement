@@ -52,10 +52,8 @@ urlpatterns = [
     path('commande-client/refuser/<int:pk>/', views.client_request_refuse, name='client_request_refuse'),
     path('commande-client/supprimer/<int:pk>/', views.client_request_delete, name='client_request_delete'),
     path('demande-personnel/', views.client_public_request, name='client_public_request'),
-        # Paiement PayTech
+    # Paiement PayTech
     path('payment/success/', views.payment_success, name='payment_success'),
     path('payment/cancel/', views.payment_cancel, name='payment_cancel'),
     path('payment/ipn/', views.payment_ipn, name='payment_ipn'),
-    path('payment/debug/', views.debug_payment_settings, name='debug_payment_settings'),
-
 ]
