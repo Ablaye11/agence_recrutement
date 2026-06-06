@@ -255,6 +255,35 @@ def debug_payment_settings(request):
     for k, v in env_vars.items():
         debug_info += f"  {k} = {v}\n"
         
+    # Read the error log to diagnose 500 error
+    debug_info += "\n=== ERROR LOGS ===\n"
+    log_paths = [
+        "/var/log/www.dakarterminus.com.error.log",
+        "/var/log/dakarterminus.com.error.log",
+        "/var/log/www_dakarterminus_com_error.log",
+        "/home/ablayeseck/www.dakarterminus.com.error.log",
+        "/home/ablayeseck/dakarterminus.com.error.log",
+    ]
+    import glob
+    for p in glob.glob("/var/log/*error.log") + glob.glob("/var/log/*server.log"):
+        if p not in log_paths:
+            log_paths.append(p)
+            
+    found_log = False
+    for path in log_paths:
+        if os.path.exists(path):
+            found_log = True
+            debug_info += f"\nFile: {path}\n"
+            try:
+                with open(path, 'r', errors='ignore') as log_f:
+                    lines = log_f.readlines()
+                    debug_info += "".join(lines[-100:])
+            except Exception as e:
+                debug_info += f"Error reading log: {str(e)}\n"
+                
+    if not found_log:
+        debug_info += "No error log files found in checked paths.\n"
+        
     return HttpResponse(debug_info, content_type="text/plain")
 
 def payment_cancel(request): messages.warning(request, "Paiement annulé."); return redirect('public_register')
