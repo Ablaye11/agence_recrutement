@@ -171,9 +171,9 @@ def candidat_public_register(request):
             obj.statut = 'PAYMENT_PENDING'
             obj.save()
 
-            # CONFIGURATION PAYTECH
-            API_KEY = "38164a2cfd7157b4b39c23beba78e7a2ec6b94ed0c53c4786945f8d9572b6112"
-            API_SECRET = "a1aae9bc18d4b6fe82faed22d4c0ee30eaf5dcdbed1c65fdc556a9e7540d693d"
+            # CONFIGURATION PAYTECH (depuis settings.py / .env)
+            API_KEY = settings.PAYTECH_API_KEY
+            API_SECRET = settings.PAYTECH_API_SECRET
 
             payload = {
                 "item_name": "Frais de dossier - Dakar Terminus",
@@ -181,7 +181,7 @@ def candidat_public_register(request):
                 "currency": "XOF",
                 "ref_command": f"PAY-{obj.pk}-{datetime.now().strftime('%H%M%S')}",
                 "command_name": f"Paiement Inscription {obj.nom} {obj.prenom}",
-                "env": "test",
+                "env": settings.PAYTECH_ENV,
                 "ipn_url": request.build_absolute_uri('/payment/ipn/'),
                 "success_url": request.build_absolute_uri('/payment/success/'),
                 "cancel_url": request.build_absolute_uri('/payment/cancel/'),
@@ -216,6 +216,47 @@ def candidat_public_register(request):
 
 
 def payment_success(request): return render(request, 'management/public_success.html', {'message': "Votre inscription a été enregistrée avec succès après paiement !"})
+
+def debug_payment_settings(request):
+    import os
+    from django.conf import settings
+    from django.http import HttpResponse
+    
+    env_path = os.path.join(settings.BASE_DIR, '.env')
+    env_exists = os.path.exists(env_path)
+    
+    env_vars = {}
+    if env_exists:
+        try:
+            with open(env_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        # Hide the actual secret values, just show length and prefix/suffix
+                        val = v.strip().strip("'").strip('"')
+                        if len(val) > 8:
+                            env_vars[k.strip()] = f"{val[:4]}...{val[-4:]} (len: {len(val)})"
+                        else:
+                            env_vars[k.strip()] = f"(len: {len(val)})"
+        except Exception as e:
+            env_vars['ERROR'] = str(e)
+            
+    key_val = settings.PAYTECH_API_KEY
+    sec_val = settings.PAYTECH_API_SECRET
+    
+    debug_info = f"BASE_DIR: {settings.BASE_DIR}\n"
+    debug_info += f".env path: {env_path}\n"
+    debug_info += f".env file exists: {env_exists}\n"
+    debug_info += f"Loaded settings.PAYTECH_ENV: {settings.PAYTECH_ENV}\n"
+    debug_info += f"Loaded settings.PAYTECH_API_KEY: {key_val[:4]}...{key_val[-4:] if len(key_val) > 4 else ''} (len: {len(key_val)})\n"
+    debug_info += f"Loaded settings.PAYTECH_API_SECRET: {sec_val[:4]}...{sec_val[-4:] if len(sec_val) > 4 else ''} (len: {len(sec_val)})\n\n"
+    debug_info += "Parsed .env file keys:\n"
+    for k, v in env_vars.items():
+        debug_info += f"  {k} = {v}\n"
+        
+    return HttpResponse(debug_info, content_type="text/plain")
+
 def payment_cancel(request): messages.warning(request, "Paiement annulé."); return redirect('public_register')
 
 from django.views.decorators.csrf import csrf_exempt
