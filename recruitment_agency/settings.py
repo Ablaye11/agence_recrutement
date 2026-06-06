@@ -26,9 +26,24 @@ try:
     else:
         from decouple import config
 except ImportError:
-    # Fonction de secours si python-decouple n'est pas installé dans l'environnement
+    # Fonction de secours qui lit manuellement le fichier .env si decouple est absent
+    _env_dict = {}
+    env_file = BASE_DIR / '.env'
+    if env_file.exists():
+        try:
+            with open(env_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        # On nettoie les éventuels guillemets autour de la valeur
+                        val = v.strip().strip("'").strip('"')
+                        _env_dict[k.strip()] = val
+        except Exception:
+            pass
+
     def config(option, default=None, cast=None):
-        val = os.getenv(option, default)
+        val = _env_dict.get(option, os.getenv(option, default))
         if cast == bool and isinstance(val, str):
             return val.lower() in ('true', '1', 'yes', 'y', 't')
         if cast and val is not None:
