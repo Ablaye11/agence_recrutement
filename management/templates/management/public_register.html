@@ -94,6 +94,9 @@
         .form-group { 
             margin-bottom: 1.25rem; 
         }
+        .full-width {
+            grid-column: span 2;
+        }
         .form-group label {
             display: block; 
             margin-bottom: 8px; 
@@ -216,7 +219,7 @@
                 {% csrf_token %}
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     {% for field in form %}
-                    <div class="form-group {% if field.name == 'experience' or field.name == 'adresse' or field.name == 'commentaire' %}full-width{% endif %}" style="{% if field.name == 'experience' or field.name == 'adresse' or field.name == 'commentaire' %}grid-column: span 2;{% endif %}">
+                    <div class="form-group {% if field.name == 'experience' or field.name == 'adresse' or field.name == 'commentaire' %}full-width{% endif %}">
                         <label>{{ field.label }}</label>
                         {{ field }}
                         {% if field.errors %}
