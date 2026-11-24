@@ -231,7 +231,10 @@
             </script>
         </header>
         {% endif %}
-        </main>
+
+        <div id="main-content">
+            {% block content %}{% endblock %}
+        </div>
     </main> <!-- Fermeture de .main-content -->
 
     {% block extra_js %}{% endblock %}
