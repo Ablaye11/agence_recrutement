@@ -1010,6 +1010,12 @@
                         <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">(Descente week-end)</span>
                     </div>
 
+                    <div class="dispo-card" data-dispo="BI_WEEKLY" onclick="selectDispo('BI_WEEKLY', this, 'Descend chaque 15 jours')">
+                        <div style="font-size: 1.4rem; margin-bottom: 4px;">📅</div>
+                        <div>Chaque 15 jours</div>
+                        <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">(Descente 15 jours)</span>
+                    </div>
+
                     <div class="dispo-card" data-dispo="JOURNALIER" onclick="selectDispo('JOURNALIER', this, 'Journalier')">
                         <div style="font-size: 1.4rem; margin-bottom: 4px;">☀️</div>
                         <div>Journalier</div>
@@ -1178,6 +1184,26 @@
                     <span class="pm-pill">🟢 Free Money</span>
                     <span class="pm-pill">💳 Carte Visa/Mastercard</span>
                 </div>
+            </div>
+
+            <!-- CONDITIONS D'INSCRIPTION & ENGAGEMENT -->
+            <div style="background: #ffffff; border: 2px solid #cbd5e1; border-radius: 16px; padding: 16px; margin: 20px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
+                    <div style="font-weight: 800; font-size: 1rem; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.2rem;">📜</span>
+                        <span>Conditions & Règlement de l'Agence</span>
+                    </div>
+                    <button type="button" class="sound-icon-btn" title="Écouter les conditions" onclick="speakText('Je certifie l exactitude de toutes les informations et pièces d identité fournies. Je m engage à respecter les règles de l agence Dakar Terminus et j accepte le règlement des frais de dossier de 5000 FCFA nécessaires à l enregistrement de ma candidature.')">
+                        🔊
+                    </button>
+                </div>
+                
+                <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="accept_conditions" name="accept_conditions" required style="width: 24px; height: 24px; accent-color: #10b981; margin-top: 2px; flex-shrink: 0; cursor: pointer;">
+                    <span style="font-size: 0.92rem; color: #334155; line-height: 1.5; font-weight: 500;">
+                        Je certifie que les informations et documents fournis sont exacts, et <strong>j'accepte les conditions et le règlement de l'agence Dakar Terminus</strong> pour l'enregistrement et le traitement de mon dossier de candidature.
+                    </span>
+                </label>
             </div>
 
             <!-- Bouton d'action principal -->
