@@ -8,16 +8,16 @@
     {% csrf_token %}
 
     <div class="card" style="margin-bottom: 2rem;">
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+        <div class="filter-bar">
             <!-- Recherche texte -->
-            <div style="flex: 2; min-width: 250px;">
-                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Recherche Nom / Tel</label>
+            <div style="flex: 2 1 220px;">
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Recherche Nom / Tel</label>
                 <input type="text" id="search-input" class="form-control" placeholder="Nom, prénom ou téléphone...">
             </div>
 
             <!-- Filtre Métier -->
-            <div style="flex: 1; min-width: 180px;">
-                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Métier</label>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Métier</label>
                 <select id="filter-poste" class="form-control">
                     <option value="">Tous les métiers</option>
                     {% for key, value in poste_choices %}
@@ -27,14 +27,14 @@
             </div>
 
             <!-- Filtre Zone -->
-            <div style="flex: 1; min-width: 150px;">
-                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Zone / Quartier</label>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Zone / Quartier</label>
                 <input type="text" id="filter-zone" class="form-control" placeholder="Ex: Plateau...">
             </div>
 
             <!-- Filtre Disponibilité -->
-            <div style="flex: 1; min-width: 150px;">
-                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Disponibilité</label>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Disponibilité</label>
                 <select id="filter-dispo" class="form-control">
                      <option value="">Toutes</option>
                         {% for key, value in dispo_choices %}
@@ -44,8 +44,8 @@
             </div>
 
             <!-- Filtre Statut -->
-            <div style="flex: 1; min-width: 130px;">
-                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Statut</label>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Statut</label>
                 <select id="filter-statut" class="form-control">
                     <option value="">Tous</option>
                     <option value="Disponible">Disponible</option>
@@ -54,9 +54,9 @@
                 </select>
             </div>
 
-            <div style="display: flex; gap: 10px;">
-                <a href="{% url 'export_candidats_excel' %}" hx-boost="false" class="btn" style="background: #10b981; color: white; text-decoration: none;">📥 Excel</a>
-                <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="background: var(--success); text-decoration: none;">+ Nouveau</a>
+            <div class="filter-actions">
+                <a href="{% url 'export_candidats_excel' %}" hx-boost="false" class="btn" style="background: #10b981; color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap;">📥 Excel</a>
+                <a href="{% url 'candidat_create' %}" class="btn btn-primary" style="background: var(--success); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;">+ Nouveau</a>
             </div>
         </div>
     </div>
