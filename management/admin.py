@@ -1,11 +1,18 @@
 from django.contrib import admin
-from .models import Candidat, Client, Placement
+from .models import Candidat, Client, Placement, PreInscription, Notification, Expense, ClientRequest
 
-admin.site.site_header = "Administration AGENCE PRO"
-admin.site.site_title = "AGENCE PRO"
+admin.site.site_header = "Administration DAKAR TERMINUS"
+admin.site.site_title = "DAKAR TERMINUS"
 admin.site.index_title = "Gestion de l'Agence"
 
 from django.utils.html import format_html
+
+@admin.register(PreInscription)
+class PreInscriptionAdmin(admin.ModelAdmin):
+    list_display = ('ref_command', 'nom', 'prenom', 'poste_recherche', 'telephone', 'tuteur', 'statut_paiement', 'date_creation')
+    list_filter = ('statut_paiement', 'poste_recherche', 'date_creation')
+    search_fields = ('ref_command', 'nom', 'prenom', 'telephone', 'tuteur')
+    readonly_fields = ('ref_command', 'date_creation')
 
 @admin.register(Candidat)
 class CandidatAdmin(admin.ModelAdmin):
@@ -15,22 +22,22 @@ class CandidatAdmin(admin.ModelAdmin):
         return "-"
     photo_tag.short_description = 'Photo'
 
-    list_display = ('photo_tag', 'matricule', 'nom', 'prenom', 'poste_recherche', 'statut', 'date_inscription')
-    list_filter = ('statut', 'poste_recherche', 'disponibilite')
-    search_fields = ('matricule', 'nom', 'prenom', 'telephone')
+    list_display = ('photo_tag', 'matricule', 'nom', 'prenom', 'poste_recherche', 'statut', 'frais_paye', 'date_inscription')
+    list_filter = ('statut', 'frais_paye', 'poste_recherche', 'disponibilite')
+    search_fields = ('matricule', 'nom', 'prenom', 'telephone', 'tuteur')
     readonly_fields = ('matricule', 'date_inscription')
     fieldsets = (
         ('Identification', {
-            'fields': ('matricule', 'photo', 'nom', 'prenom', 'age')
+            'fields': ('matricule', 'photo', 'piece_identite', 'piece_identite_verso', 'nom', 'prenom', 'age')
         }),
-        ('Coordonnées', {
-            'fields': ('telephone', 'adresse')
+        ('Coordonnées & Garant', {
+            'fields': ('telephone', 'adresse', 'tuteur')
         }),
         ('Profil Professionnel', {
-            'fields': ('poste_recherche', 'experience', 'disponibilite', 'statut')
+            'fields': ('poste_recherche', 'experience', 'disponibilite', 'statut', 'frais_paye', 'transaction_id')
         }),
         ('Notes', {
-            'fields': ('observations', 'date_inscription')
+            'fields': ('commentaire', 'observations', 'date_inscription')
         }),
     )
 

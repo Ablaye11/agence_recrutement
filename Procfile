@@ -1,0 +1,1 @@
+web: gunicorn recruitment_agency.wsgi:application

@@ -58,19 +58,20 @@ class Candidat(models.Model):
     ]
 
     matricule = models.CharField(max_length=20, unique=True, editable=False)
-    photo = models.ImageField(upload_to='candidats/')
-    # Modification ici : retrait de null=True et blank=True pour rendre la CNI obligatoire
-    piece_identite = models.FileField(upload_to='documents/cni/', verbose_name="Carte d'Identité (PDF/Image)")
-    # Modification ici : renommé en certificat_residence et changement du nom affiché
+    photo = models.ImageField(upload_to='candidats/', blank=True, null=True)
+    piece_identite = models.FileField(upload_to='documents/cni/', verbose_name="Carte d'Identité Recto (PDF/Image)", blank=True, null=True)
+    piece_identite_verso = models.FileField(upload_to='documents/cni/', null=True, blank=True, verbose_name="Carte d'Identité Verso")
     certificat_residence = models.FileField(upload_to='documents/residence/', null=True, blank=True, verbose_name="Certificat de Résidence")
-    nom = models.CharField(max_length=100)
-    prenom = models.CharField(max_length=100)
-    age = models.PositiveIntegerField()
+    nom = models.CharField(max_length=100, blank=True, default='')
+    prenom = models.CharField(max_length=100, blank=True, default='')
+    age = models.PositiveIntegerField(null=True, blank=True, default=25)
     telephone = models.CharField(max_length=20)
     adresse = models.CharField(max_length=255)
+    email = models.EmailField(blank=True, null=True, verbose_name="Email (facultatif)")
+    tuteur = models.CharField(max_length=255, blank=True, null=True, verbose_name="Tuteur (Nom et Téléphone)")
     poste_recherche = models.CharField(max_length=50, choices=POSTE_CHOICES, db_index=True)
-    experience = models.TextField()
-    disponibilite = models.CharField(max_length=50, choices=DISPO_CHOICES)
+    experience = models.TextField(blank=True, default='')
+    disponibilite = models.CharField(max_length=50, choices=DISPO_CHOICES, default='JOURNALIER')
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='AVAILABLE', db_index=True)
     frais_paye = models.BooleanField(default=False, verbose_name="Frais de dossier payés")
     transaction_id = models.CharField(max_length=100, blank=True, null=True, verbose_name="ID Transaction Paiement")
@@ -196,3 +197,97 @@ class ClientRequest(models.Model):
 
     class Meta:
         ordering = ['-date_demande']
+
+
+class PreInscription(models.Model):
+    """
+    Sas d'inscription temporaire : les données des candidats qui s'inscrivent en ligne
+    sont stockées ici UNIQUEMENT. Elles ne sont transférées dans la table Candidat
+    qu'une fois le paiement PayTech validé avec succès.
+    """
+    ref_command = models.CharField(max_length=100, unique=True, db_index=True)
+    poste_recherche = models.CharField(max_length=50, choices=Candidat.POSTE_CHOICES)
+    telephone = models.CharField(max_length=30)
+    adresse = models.CharField(max_length=255)
+    email = models.EmailField(blank=True, null=True, verbose_name="Email (facultatif)")
+    tuteur = models.CharField(max_length=255, blank=True, null=True, verbose_name="Nom et Téléphone du Tuteur")
+    nom = models.CharField(max_length=100, blank=True, default='')
+    prenom = models.CharField(max_length=100, blank=True, default='')
+    age = models.PositiveIntegerField(null=True, blank=True)
+    experience = models.TextField(blank=True, default='')
+    disponibilite = models.CharField(max_length=50, choices=Candidat.DISPO_CHOICES, default='JOURNALIER')
+    photo = models.ImageField(upload_to='temp_inscriptions/photos/', blank=True, null=True)
+    piece_identite = models.FileField(upload_to='temp_inscriptions/cni/', blank=True, null=True, verbose_name="CNI Recto")
+    piece_identite_verso = models.FileField(upload_to='temp_inscriptions/cni/', blank=True, null=True, verbose_name="CNI Verso")
+    montant = models.IntegerField(default=5000, verbose_name="Montant frais (FCFA)")
+    statut_paiement = models.CharField(
+        max_length=20,
+        choices=[
+            ('PENDING', 'En attente de paiement'),
+            ('PAID', 'Payé'),
+            ('FAILED', 'Échoué/Annulé'),
+        ],
+        default='PENDING',
+        db_index=True
+    )
+    transaction_id = models.CharField(max_length=100, blank=True, null=True, verbose_name="ID Transaction PayTech")
+    date_creation = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Pré-inscription {self.ref_command} - {self.telephone} ({self.poste_recherche}) - {self.statut_paiement}"
+
+    def transfer_to_candidat(self, transaction_token=None):
+        """
+        Transfère la pré-inscription vers la table Candidat après validation du paiement.
+        Garantit que la table Candidat n'est jamais polluée tant que le paiement n'est pas effectué.
+        """
+        token = transaction_token or self.transaction_id or self.ref_command
+
+        # Éviter les doublons
+        existant = Candidat.objects.filter(transaction_id=token).first()
+        if existant:
+            self.statut_paiement = 'PAID'
+            self.save(update_fields=['statut_paiement'])
+            return existant
+
+        nom_val = self.nom.strip() if self.nom else "Candidat"
+        prenom_val = self.prenom.strip() if self.prenom else self.telephone
+
+        candidat = Candidat(
+            nom=nom_val,
+            prenom=prenom_val,
+            age=self.age if self.age else 25,
+            telephone=self.telephone,
+            adresse=self.adresse,
+            email=self.email,
+            tuteur=self.tuteur,
+            poste_recherche=self.poste_recherche,
+            experience=self.experience,
+            disponibilite=self.disponibilite,
+            statut='WAITING',  # Reçu et payé, en attente d'approbation administrative
+            frais_paye=True,
+            transaction_id=token,
+            commentaire=f"Inscription en ligne payée. Tuteur: {self.tuteur or 'Non spécifié'}."
+        )
+
+        if self.photo:
+            candidat.photo = self.photo
+        if self.piece_identite:
+            candidat.piece_identite = self.piece_identite
+        if self.piece_identite_verso:
+            candidat.piece_identite_verso = self.piece_identite_verso
+
+        candidat.save()
+
+        self.statut_paiement = 'PAID'
+        if transaction_token:
+            self.transaction_id = transaction_token
+        self.save()
+
+        return candidat
+
+    class Meta:
+        ordering = ['-date_creation']
+        verbose_name = "Pré-inscription en attente de paiement"
+        verbose_name_plural = "Pré-inscriptions en attente de paiement"
+

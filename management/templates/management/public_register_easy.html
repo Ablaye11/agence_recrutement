@@ -1,0 +1,1341 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inscription Facile & Emploi - DAKAR TERMINUS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --success-dark: #059669;
+            --success-light: #ecfdf5;
+            --accent: #f59e0b;
+            --dark: #0f172a;
+            --gray-700: #334155;
+            --gray-500: #64748b;
+            --gray-200: #e2e8f0;
+            --gray-100: #f1f5f9;
+            --white: #ffffff;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 20px 30px -10px rgba(37, 99, 235, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: var(--dark);
+            line-height: 1.5;
+            padding-bottom: 80px;
+        }
+
+        /* En-tête mobile collant élégant */
+        .app-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: var(--white);
+            padding: 24px 20px 30px;
+            border-bottom-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            box-shadow: 0 10px 20px rgba(30, 58, 138, 0.15);
+            position: relative;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .agency-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .audio-guide-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--white);
+            padding: 7px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .audio-guide-btn:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .header-title {
+            font-size: 1.65rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            line-height: 1.25;
+        }
+
+        .header-subtitle {
+            font-size: 0.95rem;
+            color: #dbeafe;
+            font-weight: 500;
+        }
+
+        /* Conteneur principal */
+        .container {
+            max-width: 760px;
+            margin: -15px auto 0;
+            padding: 0 16px;
+        }
+
+        /* Cartes de sections */
+        .section-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 22px 18px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid #f1f5f9;
+        }
+
+        .section-title-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .step-num {
+            background: var(--primary);
+            color: var(--white);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .sound-icon-btn {
+            background: #f1f5f9;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--primary);
+            transition: 0.2s;
+        }
+
+        .sound-icon-btn:active {
+            transform: scale(0.9);
+            background: #e2e8f0;
+        }
+
+        /* GRILLE DE MÉTIERS (ICÔNES ET CARTES VISUELLES) */
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (min-width: 540px) {
+            .jobs-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px;
+            }
+        }
+
+        .job-card {
+            position: relative;
+            background: #ffffff;
+            border: 2.5px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 14px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .job-card:active {
+            transform: scale(0.97);
+        }
+
+        .job-card.selected {
+            border-color: var(--success);
+            background: var(--success-light);
+            box-shadow: 0 8px 18px rgba(16, 185, 129, 0.22);
+            transform: translateY(-2px);
+        }
+
+        .job-card-check {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: transparent;
+            transition: all 0.2s;
+        }
+
+        .job-card.selected .job-card-check {
+            background: var(--success);
+            color: var(--white);
+            font-weight: 900;
+        }
+
+        .job-img-box {
+            width: 74px;
+            height: 74px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .job-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .job-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.25;
+            margin-bottom: 4px;
+        }
+
+        .job-audio-mini {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-size: 0.85rem;
+            margin-top: 2px;
+            cursor: pointer;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-weight: 600;
+        }
+
+        /* SECTION PHOTOS PIÈCE D'IDENTITÉ (RECTO ET VERSO) */
+        .cni-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        @media (min-width: 500px) {
+            .cni-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .cni-upload-box {
+            position: relative;
+            background: #f8fafc;
+            border: 2.5px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 20px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            overflow: hidden;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cni-upload-box:active {
+            transform: scale(0.98);
+        }
+
+        .cni-upload-box.has-file {
+            border-color: var(--success);
+            border-style: solid;
+            background: var(--success-light);
+        }
+
+        .cni-icon {
+            font-size: 2.6rem;
+            margin-bottom: 8px;
+        }
+
+        .cni-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .cni-desc {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-bottom: 12px;
+        }
+
+        .cni-btn-touch {
+            background: var(--primary);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: none;
+        }
+
+        .cni-upload-box.has-file .cni-btn-touch {
+            background: var(--success);
+        }
+
+        .cni-preview {
+            display: none;
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .visually-hidden-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* SECTION COORDONNÉES */
+        .form-field-group {
+            margin-bottom: 16px;
+        }
+
+        .field-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+
+        .field-label .required-dot {
+            color: #ef4444;
+            font-weight: 800;
+        }
+
+        .touch-input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--dark);
+            background: #ffffff;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        .touch-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+            background: #ffffff;
+        }
+
+        .touch-input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        /* Pastilles rapides pour les quartiers */
+        .quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quick-tag {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quick-tag:active, .quick-tag.active {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #bfdbfe;
+        }
+
+        /* Barre de filtres de catégories scrollable mobile */
+        .category-pills {
+            display: flex;
+            overflow-x: auto;
+            gap: 8px;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .category-pills::-webkit-scrollbar {
+            display: none;
+        }
+        .cat-pill {
+            background: #f1f5f9;
+            border: 1.5px solid #cbd5e1;
+            color: #334155;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .cat-pill:active, .cat-pill.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+        }
+
+        /* Cartes de Disponibilité */
+        .dispo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        @media (min-width: 500px) {
+            .dispo-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .dispo-card {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.88rem;
+            transition: all 0.2s;
+            background: #ffffff;
+            user-select: none;
+        }
+        .dispo-card:active {
+            transform: scale(0.97);
+        }
+        .dispo-card.selected {
+            border-color: var(--primary);
+            background: #eff6ff;
+            color: #1d4ed8;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15);
+        }
+
+        /* SECTION PAIEMENT ET VALIDATION */
+        .payment-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border: 2px solid #86efac;
+            border-radius: var(--radius-lg);
+            padding: 22px 18px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .payment-badge {
+            display: inline-block;
+            background: #10b981;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 4px 14px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .payment-price {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #065f46;
+            margin-bottom: 4px;
+        }
+
+        .payment-info {
+            font-size: 0.92rem;
+            color: #047857;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .payment-methods-icons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .pm-pill {
+            background: var(--white);
+            border: 1px solid #bbf7d0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #166534;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        /* Bouton Soumettre Géant Mobile */
+        .btn-submit-master {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: var(--white);
+            border: none;
+            padding: 20px 24px;
+            border-radius: var(--radius-lg);
+            font-size: 1.15rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            box-shadow: 0 12px 25px rgba(16, 185, 129, 0.35);
+            transition: all 0.25s;
+        }
+
+        .btn-submit-master:active {
+            transform: scale(0.98);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.25);
+        }
+
+        .security-notice {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Message d'erreur et alertes */
+        .error-alert {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #b91c1c;
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Voile de chargement lors de la soumission */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--white);
+            text-align: center;
+            padding: 24px;
+        }
+
+        .loader-spinner {
+            width: 58px;
+            height: 58px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- En-tête mobile de l'application -->
+    <header class="app-header">
+        <div class="header-top">
+            <span class="agency-badge">🇸🇳 DAKAR TERMINUS</span>
+            <button type="button" class="audio-guide-btn" onclick="speakText('Bienvenue sur le formulaire d inscription facile de l agence Dakar Terminus. Choisissez votre travail, prenez en photo votre carte d identité, et entrez votre numéro de téléphone.')">
+                <span>🔊</span> Écouter l'aide
+            </button>
+        </div>
+        <h1 class="header-title">Inscription Facile à l'Emploi</h1>
+        <p class="header-subtitle">Trouvez rapidement un travail déclaré à Dakar</p>
+    </header>
+
+    <main class="container">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-alert">
+                    <span>⚠️</span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form id="easy-register-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="poste_recherche" id="id_poste_recherche" value="{{ form.poste_recherche.value|default:'' }}" required>
+
+            <!-- ÉTAPE 1 : CHOIX DU MÉTIER (LES 33 MÉTIERS DE PRODUCTION) -->
+            <section class="section-card">
+                <div class="section-title-wrap">
+                    <div class="section-title">
+                        <span class="step-num">1</span>
+                        <span>Quel travail cherchez-vous ? (33 Métiers)</span>
+                    </div>
+                    <button type="button" class="sound-icon-btn" title="Écouter" onclick="speakText('Étape 1 : Choisissez le travail que vous souhaitez faire parmi la liste.')">
+                        🔊
+                    </button>
+                </div>
+
+                <!-- Filtres par catégories -->
+                <div class="category-pills" id="category-filters">
+                    <button type="button" class="cat-pill active" onclick="filterCategory('all', this)">🌟 Tous (33)</button>
+                    <button type="button" class="cat-pill" onclick="filterCategory('cat-nounou', this)">👶 Nounou & Enfants</button>
+                    <button type="button" class="cat-pill" onclick="filterCategory('cat-menage', this)">🧹 Ménage & Nettoyage</button>
+                    <button type="button" class="cat-pill" onclick="filterCategory('cat-cuisine', this)">👩‍🍳 Cuisine & Resto</button>
+                    <button type="button" class="cat-pill" onclick="filterCategory('cat-transport', this)">🚗 Chauffeur & Livreur</button>
+                    <button type="button" class="cat-pill" onclick="filterCategory('cat-securite', this)">👮 Sécurité & Gardien</button>
+                    <button type="button" class="cat-pill" onclick="filterCategory('cat-vente', this)">🛍️ Commerce & Bureau</button>
+                    <button type="button" class="cat-pill" onclick="filterCategory('cat-autre', this)">💼 Autres</button>
+                </div>
+
+                <div class="jobs-grid">
+                    <!-- 1. Nounou garde enfant -->
+                    <div class="job-card cat-nounou" data-job="NOUNOU" onclick="selectJob('NOUNOU', this, 'Nounou garde enfant')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/nounou.svg' %}" alt="Nounou"></div>
+                        <div class="job-name">Nounou garde enfant</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nounou garde enfant')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 2. Nounou et nettoyage -->
+                    <div class="job-card cat-nounou" data-job="NOUNOU_NETTOYAGE" onclick="selectJob('NOUNOU_NETTOYAGE', this, 'Nounou et nettoyage')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/nounou.svg' %}" alt="Nounou et nettoyage"></div>
+                        <div class="job-name">Nounou & Nettoyage</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nounou et nettoyage')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 3. Femme de ménage -->
+                    <div class="job-card cat-menage" data-job="MENAGE" onclick="selectJob('MENAGE', this, 'Femme de ménage')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Femme de ménage"></div>
+                        <div class="job-name">Femme de ménage</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Femme de ménage')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 4. Nettoyage simple -->
+                    <div class="job-card cat-menage" data-job="NETTOYAGE_SIMPLE" onclick="selectJob('NETTOYAGE_SIMPLE', this, 'Nettoyage')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Nettoyage"></div>
+                        <div class="job-name">Nettoyage</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nettoyage')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 5. Boy domestique -->
+                    <div class="job-card cat-menage" data-job="BOY" onclick="selectJob('BOY', this, 'Boy domestique')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Boy domestique"></div>
+                        <div class="job-name">Boy domestique</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Boy domestique')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 6. Lingère et repassage -->
+                    <div class="job-card cat-menage" data-job="LINGERE" onclick="selectJob('LINGERE', this, 'Lingère et repassage')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/lingere.svg' %}" alt="Lingère"></div>
+                        <div class="job-name">Lingère & Repassage</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Lingère et repassage')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 7. Gouvernante -->
+                    <div class="job-card cat-menage" data-job="GOUVERNANTE" onclick="selectJob('GOUVERNANTE', this, 'Gouvernante')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Gouvernante"></div>
+                        <div class="job-name">Gouvernante</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Gouvernante')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 8. Nettoyage bureau -->
+                    <div class="job-card cat-menage" data-job="NET_BUREAU" onclick="selectJob('NET_BUREAU', this, 'Nettoyage bureau')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Nettoyage bureau"></div>
+                        <div class="job-name">Nettoyage bureau</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nettoyage bureau')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 9. Nettoyage 3 jours -->
+                    <div class="job-card cat-menage" data-job="NET_3J" onclick="selectJob('NET_3J', this, 'Nettoyage 3 jours dans la semaine')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Nettoyage 3 jours"></div>
+                        <div class="job-name">Nettoyage 3j / sem.</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nettoyage 3 jours par semaine')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 10. Nettoyage escalier -->
+                    <div class="job-card cat-menage" data-job="NET_ESCALIER" onclick="selectJob('NET_ESCALIER', this, 'Nettoyage escalier')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Nettoyage escalier"></div>
+                        <div class="job-name">Nettoyage escalier</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nettoyage escalier')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 11. Nettoyage appartement -->
+                    <div class="job-card cat-menage" data-job="NET_APPART" onclick="selectJob('NET_APPART', this, 'Nettoyage appartement')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Nettoyage appartement"></div>
+                        <div class="job-name">Nettoyage appart.</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nettoyage appartement')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 12. Nettoyage fin de chantier -->
+                    <div class="job-card cat-menage" data-job="NET_CHANTIER" onclick="selectJob('NET_CHANTIER', this, 'Nettoyage fin de chantier')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Fin de chantier"></div>
+                        <div class="job-name">Fin de chantier</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nettoyage fin de chantier')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 13. Nettoyage soir -->
+                    <div class="job-card cat-menage" data-job="NET_SOIR" onclick="selectJob('NET_SOIR', this, 'Nettoyage soir')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Nettoyage soir"></div>
+                        <div class="job-name">Nettoyage soir</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nettoyage soir')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 14. Nettoyage restaurant -->
+                    <div class="job-card cat-menage" data-job="NET_RESTO" onclick="selectJob('NET_RESTO', this, 'Nettoyage restaurant')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Nettoyage restaurant"></div>
+                        <div class="job-name">Nettoyage restaurant</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Nettoyage restaurant')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 15. Société de nettoyage Dakar Terminus -->
+                    <div class="job-card cat-menage" data-job="SOCIETE_DE_NETTOYAGE_DAKAR_TERMINUS" onclick="selectJob('SOCIETE_DE_NETTOYAGE_DAKAR_TERMINUS', this, 'Société de nettoyage Dakar Terminus')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/menage.svg' %}" alt="Société nettoyage"></div>
+                        <div class="job-name">Société Nettoyage</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Société de nettoyage Dakar Terminus')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 16. Cuisinière plat sénégalais -->
+                    <div class="job-card cat-cuisine" data-job="CUISINE_SEN" onclick="selectJob('CUISINE_SEN', this, 'Cuisinière plat sénégalais')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/cuisine.svg' %}" alt="Cuisinière sénégalaise"></div>
+                        <div class="job-name">Cuisine sénégalaise</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Cuisinière plat sénégalais')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 17. Cuisinière professionnel -->
+                    <div class="job-card cat-cuisine" data-job="CUISINE_PRO" onclick="selectJob('CUISINE_PRO', this, 'Cuisinière professionnel')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/cuisine.svg' %}" alt="Cuisinière pro"></div>
+                        <div class="job-name">Cuisine Professionnel</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Cuisinière professionnel')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 18. Cuisine et nettoyage -->
+                    <div class="job-card cat-cuisine" data-job="CUISINE_NETTOYAGE" onclick="selectJob('CUISINE_NETTOYAGE', this, 'Cuisine et nettoyage')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/cuisine.svg' %}" alt="Cuisine et nettoyage"></div>
+                        <div class="job-name">Cuisine & Nettoyage</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Cuisine et nettoyage')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 19. Cuisine et nettoyage appartement -->
+                    <div class="job-card cat-cuisine" data-job="CUISINE_NET" onclick="selectJob('CUISINE_NET', this, 'Cuisine et nettoyage appartement')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/cuisine.svg' %}" alt="Cuisine et appart"></div>
+                        <div class="job-name">Cuisine & Appart.</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Cuisine et nettoyage appartement')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 20. Cuisine et nounou -->
+                    <div class="job-card cat-cuisine" data-job="CUISINE_NOUNOU" onclick="selectJob('CUISINE_NOUNOU', this, 'Cuisine et nounou')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/cuisine.svg' %}" alt="Cuisine et nounou"></div>
+                        <div class="job-name">Cuisine & Nounou</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Cuisine et nounou')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 21. Plonge restaurant -->
+                    <div class="job-card cat-cuisine" data-job="PLONGE" onclick="selectJob('PLONGE', this, 'Plonge restaurant')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/plonge.svg' %}" alt="Plonge"></div>
+                        <div class="job-name">Plonge Restaurant</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Plonge restaurant')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 22. Serveuse / Serveur -->
+                    <div class="job-card cat-cuisine" data-job="SERVEUR" onclick="selectJob('SERVEUR', this, 'Serveuse ou serveur')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/plonge.svg' %}" alt="Serveur"></div>
+                        <div class="job-name">Serveuse (er)</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Serveuse ou serveur restaurant')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 23. Chauffeur particulier -->
+                    <div class="job-card cat-transport" data-job="CHAUFFEUR_P" onclick="selectJob('CHAUFFEUR_P', this, 'Chauffeur particulier')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/chauffeur.svg' %}" alt="Chauffeur particulier"></div>
+                        <div class="job-name">Chauffeur particulier</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Chauffeur particulier')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 24. Chauffeur Yango -->
+                    <div class="job-card cat-transport" data-job="CHAUFFEUR_Y" onclick="selectJob('CHAUFFEUR_Y', this, 'Chauffeur Yango')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/chauffeur.svg' %}" alt="Chauffeur Yango"></div>
+                        <div class="job-name">Chauffeur Yango</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Chauffeur Yango ou VTC')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 25. Chauffeur livreur moto -->
+                    <div class="job-card cat-transport" data-job="LIVREUR_MOTO" onclick="selectJob('LIVREUR_MOTO', this, 'Chauffeur livreur moto')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/livreur.svg' %}" alt="Livreur moto"></div>
+                        <div class="job-name">Livreur moto</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Chauffeur livreur moto')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 26. Gardiennage jour ou nuit -->
+                    <div class="job-card cat-securite" data-job="GARDIEN" onclick="selectJob('GARDIEN', this, 'Gardiennage jour ou nuit')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/gardien.svg' %}" alt="Gardiennage"></div>
+                        <div class="job-name">Gardiennage Jour/Nuit</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Gardiennage jour ou nuit')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 27. Jardinier -->
+                    <div class="job-card cat-autre" data-job="JARDINIER" onclick="selectJob('JARDINIER', this, 'Jardinier')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/jardinage.svg' %}" alt="Jardinier"></div>
+                        <div class="job-name">Jardinier</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Jardinier')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 28. Aide personne âgée -->
+                    <div class="job-card cat-autre" data-job="AIDE_VIE" onclick="selectJob('AIDE_VIE', this, 'Aide personne âgée')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/nounou.svg' %}" alt="Aide personne âgée"></div>
+                        <div class="job-name">Aide personne âgée</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Aide pour personne âgée')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 29. Vendeuse Boutique -->
+                    <div class="job-card cat-vente" data-job="VENDEUSE" onclick="selectJob('VENDEUSE', this, 'Vendeuse Boutique')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/vendeuse.svg' %}" alt="Vendeuse Boutique"></div>
+                        <div class="job-name">Vendeuse Boutique</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Vendeuse en boutique')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 30. Caissière (er) -->
+                    <div class="job-card cat-vente" data-job="CAISSIER" onclick="selectJob('CAISSIER', this, 'Caissière ou caissier')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/vendeuse.svg' %}" alt="Caissière"></div>
+                        <div class="job-name">Caissière (er)</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Caissière ou caissier')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 31. Secrétaire -->
+                    <div class="job-card cat-vente" data-job="SECRETAIRE" onclick="selectJob('SECRETAIRE', this, 'Secrétaire')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/autre.svg' %}" alt="Secrétaire"></div>
+                        <div class="job-name">Secrétaire</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Secrétaire')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 32. Assistante -->
+                    <div class="job-card cat-vente" data-job="ASSISTANTE" onclick="selectJob('ASSISTANTE', this, 'Assistante')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/autre.svg' %}" alt="Assistante"></div>
+                        <div class="job-name">Assistante</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Assistante de direction')">🔊 Écouter</button>
+                    </div>
+
+                    <!-- 33. Autre..... -->
+                    <div class="job-card cat-autre" data-job="AUTRE" onclick="selectJob('AUTRE', this, 'Autre travail')">
+                        <div class="job-card-check">✓</div>
+                        <div class="job-img-box"><img src="{% static 'images/jobs/autre.svg' %}" alt="Autre"></div>
+                        <div class="job-name">Autre travail...</div>
+                        <button type="button" class="job-audio-mini" onclick="event.stopPropagation(); speakText('Autre métier ou compétence')">🔊 Écouter</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ÉTAPE 1 BIS : DISPONIBILITÉ & EXPÉRIENCE (CRITÈRES DE PROD) -->
+            <section class="section-card">
+                <div class="section-title-wrap">
+                    <div class="section-title">
+                        <span class="step-num">★</span>
+                        <span>Votre Disponibilité</span>
+                    </div>
+                    <button type="button" class="sound-icon-btn" title="Écouter" onclick="speakText('Choisissez si vous voulez être logée ou descendre chaque jour.')">
+                        🔊
+                    </button>
+                </div>
+
+                <input type="hidden" name="disponibilite" id="id_disponibilite" value="{{ form.disponibilite.value|default:'DAILY' }}">
+                <input type="hidden" name="experience" id="id_experience" value="{{ form.experience.value|default:'1 à 2 ans d\'expérience' }}">
+
+                <div class="dispo-grid">
+                    <div class="dispo-card selected" data-dispo="DAILY" onclick="selectDispo('DAILY', this, 'Descend chaque jour')">
+                        <div style="font-size: 1.4rem; margin-bottom: 4px;">🚶‍♀️</div>
+                        <div>Descend chaque jour</div>
+                        <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">(Non logée)</span>
+                    </div>
+
+                    <div class="dispo-card" data-dispo="LIVE_IN" onclick="selectDispo('LIVE_IN', this, 'Logée sur place')">
+                        <div style="font-size: 1.4rem; margin-bottom: 4px;">🏠</div>
+                        <div>Logée</div>
+                        <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">(Dort sur place)</span>
+                    </div>
+
+                    <div class="dispo-card" data-dispo="WEEKLY" onclick="selectDispo('WEEKLY', this, 'Descente chaque semaine')">
+                        <div style="font-size: 1.4rem; margin-bottom: 4px;">🗓️</div>
+                        <div>Chaque semaine</div>
+                        <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">(Descente week-end)</span>
+                    </div>
+
+                    <div class="dispo-card" data-dispo="JOURNALIER" onclick="selectDispo('JOURNALIER', this, 'Journalier')">
+                        <div style="font-size: 1.4rem; margin-bottom: 4px;">☀️</div>
+                        <div>Journalier</div>
+                        <span style="font-size: 0.75rem; color: #64748b; font-weight: normal;">(Au jour le jour)</span>
+                    </div>
+                </div>
+
+                <!-- Expérience rapide -->
+                <div style="margin-top: 14px;">
+                    <div style="font-size: 0.88rem; font-weight: 700; color: #475569; margin-bottom: 8px;">Votre niveau d'expérience :</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="quick-tag active exp-btn" onclick="setExperience('Débutant(e) motivé(e)', this)">⭐ Débutant</button>
+                        <button type="button" class="quick-tag exp-btn" onclick="setExperience('1 à 2 ans d\'expérience', this)">⭐⭐ 1 à 2 ans</button>
+                        <button type="button" class="quick-tag exp-btn" onclick="setExperience('Plus de 3 ans d\'expérience', this)">⭐⭐⭐ 3 ans et +</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ÉTAPE 2 : PHOTO SELFIE & CARTE D'IDENTITÉ -->
+            <section class="section-card">
+                <div class="section-title-wrap">
+                    <div class="section-title">
+                        <span class="step-num">2</span>
+                        <span>Votre Photo (Selfie) & Carte d'Identité</span>
+                    </div>
+                    <button type="button" class="sound-icon-btn" title="Écouter" onclick="speakText('Étape 2 : Prenez une photo de votre visage en selfie, puis le devant et le derrière de votre carte d identité.')">
+                        🔊
+                    </button>
+                </div>
+
+                <!-- SELFIE VISAGE DU CANDIDAT -->
+                <div style="margin-bottom: 16px;">
+                    <div class="cni-upload-box" id="box-selfie" style="border-color: #60a5fa; background: #eff6ff; max-width: 380px; margin: 0 auto 16px;">
+                        <img id="preview-selfie" class="cni-preview" style="border-radius: 50%; width: 140px; height: 140px; object-fit: cover; margin: 0 auto 10px; border: 4px solid #3b82f6;" alt="Aperçu Selfie">
+                        <div class="cni-content-initial" id="content-selfie">
+                            <div class="cni-icon" style="font-size: 3rem;">🤳</div>
+                            <div class="cni-title" style="color: #1e40af;">Prenez votre PHOTO (Selfie)</div>
+                            <div class="cni-desc">Photo claire de votre visage bien éclairé</div>
+                            <span class="cni-btn-touch" style="background: #2563eb;">📸 Prendre mon Selfie</span>
+                        </div>
+                        <input type="file" name="photo" id="id_photo" class="visually-hidden-input" accept="image/*" capture="user" onchange="previewImage(this, 'preview-selfie', 'box-selfie', 'content-selfie')" required>
+                    </div>
+                </div>
+
+                <div class="cni-grid">
+                    <!-- RECTO (DEVANT) -->
+                    <div class="cni-upload-box" id="box-cni-recto">
+                        <img id="preview-recto" class="cni-preview" alt="Aperçu CNI Recto">
+                        <div class="cni-content-initial" id="content-recto">
+                            <div class="cni-icon">🪪</div>
+                            <div class="cni-title">DEVANT de la carte</div>
+                            <div class="cni-desc">Photo nette avec votre nom et prénom</div>
+                            <span class="cni-btn-touch">📷 Photo du Recto</span>
+                        </div>
+                        <input type="file" name="piece_identite" id="id_piece_identite" class="visually-hidden-input" accept="image/*" capture="environment" onchange="previewImage(this, 'preview-recto', 'box-cni-recto', 'content-recto')" required>
+                    </div>
+
+                    <!-- VERSO (DERRIÈRE) -->
+                    <div class="cni-upload-box" id="box-cni-verso">
+                        <img id="preview-verso" class="cni-preview" alt="Aperçu CNI Verso">
+                        <div class="cni-content-initial" id="content-verso">
+                            <div class="cni-icon">🔄</div>
+                            <div class="cni-title">DERRIÈRE de la carte</div>
+                            <div class="cni-desc">Photo du dos de votre carte d'identité</div>
+                            <span class="cni-btn-touch">📷 Photo du Verso</span>
+                        </div>
+                        <input type="file" name="piece_identite_verso" id="id_piece_identite_verso" class="visually-hidden-input" accept="image/*" capture="environment" onchange="previewImage(this, 'preview-verso', 'box-cni-verso', 'content-verso')" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ÉTAPE 3 : COORDONNÉES ET TUTEUR -->
+            <section class="section-card">
+                <div class="section-title-wrap">
+                    <div class="section-title">
+                        <span class="step-num">3</span>
+                        <span>Vos Coordonnées & Tuteur</span>
+                    </div>
+                    <button type="button" class="sound-icon-btn" title="Écouter" onclick="speakText('Étape 3 : Donnez votre numéro de téléphone, votre quartier, et le nom de votre tuteur.')">
+                        🔊
+                    </button>
+                </div>
+
+                <!-- Numéro de téléphone -->
+                <div class="form-field-group">
+                    <label class="field-label" for="id_telephone">
+                        <span>📞 Votre Téléphone (WhatsApp / Orange / Wave)</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="tel" name="telephone" id="id_telephone" class="touch-input" placeholder="Ex: 77 123 45 67" required autocomplete="tel" value="{{ form.telephone.value|default:'' }}">
+                </div>
+
+                <!-- Adresse / Quartier -->
+                <div class="form-field-group">
+                    <label class="field-label" for="id_adresse">
+                        <span>📍 Où habitez-vous ? (Quartier / Ville)</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="text" name="adresse" id="id_adresse" class="touch-input" placeholder="Ex: Grand Yoff, Pikine, Parcelles..." required value="{{ form.adresse.value|default:'' }}">
+                    
+                    <div class="quick-tags">
+                        <button type="button" class="quick-tag" onclick="setQuartier('Grand Yoff')">Grand Yoff</button>
+                        <button type="button" class="quick-tag" onclick="setQuartier('Pikine')">Pikine</button>
+                        <button type="button" class="quick-tag" onclick="setQuartier('Guédiawaye')">Guédiawaye</button>
+                        <button type="button" class="quick-tag" onclick="setQuartier('Parcelles Assainies')">Parcelles</button>
+                        <button type="button" class="quick-tag" onclick="setQuartier('Rufisque')">Rufisque</button>
+                        <button type="button" class="quick-tag" onclick="setQuartier('Keur Massar')">Keur Massar</button>
+                        <button type="button" class="quick-tag" onclick="setQuartier('Médina')">Médina</button>
+                        <button type="button" class="quick-tag" onclick="setQuartier('Ouakam')">Ouakam</button>
+                    </div>
+                </div>
+
+                <!-- Âge et Email -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-field-group">
+                        <label class="field-label" for="id_age">
+                            <span>🎂 Votre Âge</span>
+                            <span class="required-dot">*</span>
+                        </label>
+                        <input type="number" name="age" id="id_age" class="touch-input" placeholder="Ex: 26" min="18" max="70" required value="{{ form.age.value|default:'' }}">
+                    </div>
+                    <div class="form-field-group">
+                        <label class="field-label" for="id_email">
+                            <span>✉️ Email (facultatif)</span>
+                        </label>
+                        <input type="email" name="email" id="id_email" class="touch-input" placeholder="exemple@gmail.com" value="{{ form.email.value|default:'' }}">
+                    </div>
+                </div>
+
+                <!-- Tuteur / Personne de confiance -->
+                <div class="form-field-group">
+                    <label class="field-label" for="id_tuteur">
+                        <span>👨‍👩‍👧 Nom et Téléphone du Tuteur (Garant / Famille)</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="text" name="tuteur" id="id_tuteur" class="touch-input" placeholder="Ex: Oncle Mamadou - 77 987 65 43" required value="{{ form.tuteur.value|default:'' }}">
+                </div>
+
+                <!-- Nom & Prénom (Optionnel) -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-field-group">
+                        <label class="field-label" for="id_prenom">
+                            <span>Prénom (facultatif)</span>
+                        </label>
+                        <input type="text" name="prenom" id="id_prenom" class="touch-input" placeholder="Votre prénom" value="{{ form.prenom.value|default:'' }}">
+                    </div>
+                    <div class="form-field-group">
+                        <label class="field-label" for="id_nom">
+                            <span>Nom (facultatif)</span>
+                        </label>
+                        <input type="text" name="nom" id="id_nom" class="touch-input" placeholder="Votre nom" value="{{ form.nom.value|default:'' }}">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ÉTAPE 4 : FRAIS DE DOSSIER ET PAIEMENT SÉCURISÉ -->
+            <div class="payment-box">
+                <span class="payment-badge">Paiement Garanti & Sécurisé</span>
+                <div class="payment-price">5 000 FCFA</div>
+                <p class="payment-info" style="font-weight: 700; color: #065f46; margin-bottom: 6px;">Montant net et unique : aucun frais supplémentaire à votre charge</p>
+                <p style="font-size: 0.85rem; color: #047857; margin-bottom: 14px;">Les frais de transaction PayTech (Wave / Orange Money) sont 100% pris en charge par l'agence Dakar Terminus.</p>
+
+                <div class="payment-methods-icons">
+                    <span class="pm-pill">🌊 Wave</span>
+                    <span class="pm-pill">🍊 Orange Money</span>
+                    <span class="pm-pill">🟢 Free Money</span>
+                    <span class="pm-pill">💳 Carte Visa/Mastercard</span>
+                </div>
+            </div>
+
+            <!-- Bouton d'action principal -->
+            <button type="submit" class="btn-submit-master" id="btn-submit">
+                <span>Payer 5 000 FCFA seulement & Envoyer mon Dossier</span>
+                <span>➔</span>
+            </button>
+
+            <p class="security-notice">
+                🔒 Vos informations ne sont officiellement enregistrées à l'agence qu'une fois le paiement validé.
+            </p>
+        </form>
+
+    </main>
+
+    <!-- Écran de chargement plein écran lors du traitement -->
+    <div id="loading-overlay">
+        <div class="loader-spinner"></div>
+        <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 8px;">Envoi de vos documents en cours...</h3>
+        <p style="font-size: 0.95rem; opacity: 0.9;">Vous allez être redirigé vers le paiement sécurisé Wave / Orange Money ⏳</p>
+    </div>
+
+    <script>
+        // Synthèse vocale accessible
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.92; // Débit légèrement ralenti pour faciliter la compréhension
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Filtrage des métiers par catégories
+        function filterCategory(catClass, btn) {
+            document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+
+            const allCards = document.querySelectorAll('.job-card');
+            if (catClass === 'all') {
+                allCards.forEach(c => c.style.display = 'flex');
+            } else {
+                allCards.forEach(c => {
+                    if (c.classList.contains(catClass)) {
+                        c.style.display = 'flex';
+                    } else {
+                        c.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // Sélection de disponibilité
+        function selectDispo(dispoCode, el, speech) {
+            document.querySelectorAll('.dispo-card').forEach(d => d.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('id_disponibilite').value = dispoCode;
+            if (navigator.vibrate) navigator.vibrate(30);
+            if (speech) speakText(speech);
+        }
+
+        // Sélection rapide d'expérience
+        function setExperience(expText, btn) {
+            document.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('id_experience').value = expText;
+            if (navigator.vibrate) navigator.vibrate(25);
+        }
+
+        // Sélection visuelle du travail
+        function selectJob(jobCode, element, spokenTitle) {
+            // Supprimer la sélection précédente
+            document.querySelectorAll('.job-card').forEach(card => card.classList.remove('selected'));
+            
+            // Sélectionner l'élément actuel
+            element.classList.add('selected');
+            document.getElementById('id_poste_recherche').value = jobCode;
+
+            // Retour haptique doux si disponible sur smartphone
+            if (navigator.vibrate) {
+                navigator.vibrate(40);
+            }
+
+            if (spokenTitle) {
+                speakText(spokenTitle + " sélectionné");
+            }
+        }
+
+        // Pré-remplissage rapide du quartier
+        function setQuartier(nomQuartier) {
+            const input = document.getElementById('id_adresse');
+            input.value = nomQuartier;
+            input.focus();
+            if (navigator.vibrate) navigator.vibrate(30);
+        }
+
+        // Prévisualisation des photos CNI Recto et Verso
+        function previewImage(input, imgId, boxId, initialContentId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(imgId);
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+
+                    const box = document.getElementById(boxId);
+                    box.classList.add('has-file');
+
+                    const initial = document.getElementById(initialContentId);
+                    if (initial) {
+                        initial.innerHTML = '<span class="cni-btn-touch">✅ Photo prête (toucher pour changer)</span>';
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Validation avant envoi et affichage de l'animation
+        document.getElementById('easy-register-form').addEventListener('submit', function(e) {
+            const job = document.getElementById('id_poste_recherche').value;
+            if (!job) {
+                e.preventDefault();
+                speakText("Veuillez choisir un travail en cliquant sur une image en haut.");
+                alert("⚠️ Veuillez choisir votre métier en cliquant sur l'une des images en haut (Étape 1).");
+                window.scrollTo({ top: 120, behavior: 'smooth' });
+                return false;
+            }
+
+            const selfie = document.getElementById('id_photo').files.length;
+            if (!selfie) {
+                e.preventDefault();
+                speakText("Veuillez prendre une photo de votre visage en selfie.");
+                alert("⚠️ Veuillez prendre votre photo Selfie (Étape 2).");
+                return false;
+            }
+
+            const cniRecto = document.getElementById('id_piece_identite').files.length;
+            const cniVerso = document.getElementById('id_piece_identite_verso').files.length;
+            if (!cniRecto || !cniVerso) {
+                e.preventDefault();
+                speakText("Veuillez ajouter les photos du devant et du derrière de votre carte d identité.");
+                alert("⚠️ Veuillez prendre en photo le DEVANT et le DERRIÈRE de votre carte d'identité (Étape 2).");
+                return false;
+            }
+
+            // Afficher le voile de chargement
+            document.getElementById('loading-overlay').style.display = 'flex';
+        });
+
+        // Initialisation si un métier était déjà sélectionné
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentJob = document.getElementById('id_poste_recherche').value;
+            if (currentJob) {
+                const card = document.querySelector(`.job-card[data-job="${currentJob}"]`);
+                if (card) card.classList.add('selected');
+            }
+        });
+    </script>
+</body>
+</html>

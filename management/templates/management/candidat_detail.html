@@ -8,43 +8,76 @@
     <!-- Colonne de gauche : Photo et Statut -->
     <div class="card" style="text-align: center;">
         {% if candidat.photo %}
-        <img src="{{ candidat.photo.url }}" style="width: 100%; max-width: 250px; aspect-ratio: 1; border-radius: 1.5rem; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid #fff; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+        <img src="{{ candidat.photo.url }}"
+            style="width: 100%; max-width: 250px; aspect-ratio: 1; border-radius: 1.5rem; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid #fff; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
         {% else %}
-        <div style="width: 100%; max-width: 250px; aspect-ratio: 1; border-radius: 1.5rem; background: #e2e8f0; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 5rem; color: var(--text-muted); font-weight: 800;">
+        <div
+            style="width: 100%; max-width: 250px; aspect-ratio: 1; border-radius: 1.5rem; background: #e2e8f0; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 5rem; color: var(--text-muted); font-weight: 800;">
             {{ candidat.nom|slice:":1" }}
         </div>
         {% endif %}
 
         <h2 style="margin-bottom: 0.5rem;">{{ candidat.nom }} {{ candidat.prenom }}</h2>
         <p style="color: var(--text-muted); font-weight: 600; margin-bottom: 1rem;">{{ candidat.matricule }}</p>
-        <span class="badge badge-{{ candidat.statut|lower }}" style="font-size: 1rem; padding: 0.5rem 1.5rem; display: inline-block; margin-bottom: 2rem;">
+        <span class="badge badge-{{ candidat.statut|lower }}"
+            style="font-size: 1rem; padding: 0.5rem 1.5rem; display: inline-block; margin-bottom: 2rem;">
             {{ candidat.get_statut_display }}
         </span>
 
         <div style="text-align: left; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
-            <h4 style="margin-bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Documents Numérisés</h4>
+            <h4
+                style="margin-bottom: 1rem; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                Documents Numérisés</h4>
             <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
                 {% if candidat.piece_identite %}
-                <a href="{{ candidat.piece_identite.url }}" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 0.75rem; background: #eff6ff; color: #1d4ed8; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
-                    <span>🪪</span> Carte d'Identité
+                <a href="{{ candidat.piece_identite.url }}" target="_blank"
+                    style="display: flex; align-items: center; gap: 10px; padding: 0.75rem; background: #eff6ff; color: #1d4ed8; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                    <span>🪪</span> CNI Recto (Devant)
                 </a>
                 {% else %}
-                <div style="padding: 0.75rem; background: #f8fafc; color: #94a3b8; border-radius: 0.75rem; font-size: 0.9rem; border: 1px dashed #cbd5e1;">❌ CNI Non fournie</div>
+                <div
+                    style="padding: 0.75rem; background: #f8fafc; color: #94a3b8; border-radius: 0.75rem; font-size: 0.9rem; border: 1px dashed #cbd5e1;">
+                    ❌ CNI Recto non fournie</div>
+                {% endif %}
+
+                {% if candidat.piece_identite_verso %}
+                <a href="{{ candidat.piece_identite_verso.url }}" target="_blank"
+                    style="display: flex; align-items: center; gap: 10px; padding: 0.75rem; background: #eff6ff; color: #1d4ed8; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                    <span>🔄</span> CNI Verso (Derrière)
+                </a>
+                {% else %}
+                <div
+                    style="padding: 0.75rem; background: #f8fafc; color: #94a3b8; border-radius: 0.75rem; font-size: 0.9rem; border: 1px dashed #cbd5e1;">
+                    ❌ CNI Verso non fournie</div>
                 {% endif %}
 
                 {% if candidat.certificat_residence %}
-<a href="{{ candidat.certificat_residence.url }}" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 0.75rem; background: #ecfdf5; color: #059669; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
-    <span>🏠</span> Certificat de Résidence
-</a>
-{% else %}
-<div style="padding: 0.75rem; background: #f8fafc; color: #94a3b8; border-radius: 0.75rem; font-size: 0.9rem; border: 1px dashed #cbd5e1;">❌ Résidence Non fournie</div>
-{% endif %}
-
+                <a href="{{ candidat.certificat_residence.url }}" target="_blank"
+                    style="display: flex; align-items: center; gap: 10px; padding: 0.75rem; background: #ecfdf5; color: #059669; border-radius: 0.75rem; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+                    <span>🏠</span> Certificat de Résidence
+                </a>
+                {% endif %}
             </div>
 
-            <p style="margin-bottom: 0.75rem;"><strong>Âge :</strong> {{ candidat.age }} ans</p>
+            <p style="margin-bottom: 0.75rem;"><strong>Âge :</strong> {{ candidat.age|default:"Non précisé" }} ans</p>
             <p style="margin-bottom: 0.75rem;"><strong>Téléphone :</strong> {{ candidat.telephone }}</p>
+            {% if candidat.email %}
+            <p style="margin-bottom: 0.75rem;"><strong>Email :</strong> <a href="mailto:{{ candidat.email }}" style="color: var(--primary-color);">{{ candidat.email }}</a></p>
+            {% endif %}
             <p style="margin-bottom: 0.75rem;"><strong>Adresse :</strong> {{ candidat.adresse }}</p>
+            {% if candidat.tuteur %}
+            <p style="margin-bottom: 0.75rem; background: #f1f5f9; padding: 8px 12px; border-radius: 8px;">
+                <strong>👨‍👩‍👧 Tuteur :</strong> {{ candidat.tuteur }}
+            </p>
+            {% endif %}
+            <p style="margin-bottom: 0.75rem;">
+                <strong>Frais de dossier :</strong>
+                {% if candidat.frais_paye %}
+                <span class="badge badge-available">✅ Payés (5 000 FCFA)</span>
+                {% else %}
+                <span class="badge" style="background: #ef4444; color: white;">Non payés</span>
+                {% endif %}
+            </p>
         </div>
     </div>
 
@@ -72,7 +105,8 @@
 
         <div class="card">
             <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Observations</h3>
-            <div style="background: #fff9db; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid var(--warning); line-height: 1.6;">
+            <div
+                style="background: #fff9db; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid var(--warning); line-height: 1.6;">
                 {% if candidat.observations %}
                 {{ candidat.observations|linebreaks }}
                 {% else %}
@@ -83,46 +117,50 @@
 
         <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
             {% if candidat.statut == 'WAITING' %}
-            <a href="{% url 'candidat_approve' candidat.pk %}" class="btn" style="background: var(--success); color: #fff; text-decoration: none; font-weight: 700;">✅ Approuver et Activer le profil</a>
+            <a href="{% url 'candidat_approve' candidat.pk %}" class="btn"
+                style="background: var(--success); color: #fff; text-decoration: none; font-weight: 700;">✅ Approuver et
+                Activer le profil</a>
             {% endif %}
 
-            <a href="{% url 'candidat_edit' candidat.pk %}" class="btn btn-primary" style="text-decoration: none;">Modifier le profil</a>
+            <a href="{% url 'candidat_edit' candidat.pk %}" class="btn btn-primary"
+                style="text-decoration: none;">Modifier le profil</a>
             {% if candidat.statut != 'PLACED' %}
-            <a href="{% url 'placement_create' %}?candidat={{ candidat.pk }}" class="btn" style="background: var(--success); color: #fff; text-decoration: none;">Placer ce candidat</a>
+            <a href="{% url 'placement_create' %}?candidat={{ candidat.pk }}" class="btn"
+                style="background: var(--success); color: #fff; text-decoration: none;">Placer ce candidat</a>
             {% endif %}
 
-            <a href="javascript:void(0)"
-               id="delete-btn"
-               data-url="{% url 'candidat_delete' candidat.pk %}"
-               data-name="{{ candidat.nom|escapejs }} {{ candidat.prenom|escapejs }}"
-               style="background: #fee2e2; color: #dc2626; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; margin-left: auto;">
-               Supprimer ce dossier
+            <a href="javascript:void(0)" id="delete-btn" data-url="{% url 'candidat_delete' candidat.pk %}"
+                data-name="{{ candidat.nom|escapejs }} {{ candidat.prenom|escapejs }}"
+                style="background: #fee2e2; color: #dc2626; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; margin-left: auto;">
+                Supprimer ce dossier
             </a>
-            <a href="{% url 'candidat_print' candidat.pk %}" target="_blank" class="btn" style="background: #1e293b; color: #fff; text-decoration: none;">Imprimer CV</a>
-            <a href="{% url 'candidat_list' %}" class="btn" style="background: var(--text-muted); color: #fff; text-decoration: none;">Retour à la liste</a>
+            <a href="{% url 'candidat_print' candidat.pk %}" target="_blank" class="btn"
+                style="background: #1e293b; color: #fff; text-decoration: none;">Imprimer CV</a>
+            <a href="{% url 'candidat_list' %}" class="btn"
+                style="background: var(--text-muted); color: #fff; text-decoration: none;">Retour à la liste</a>
         </div>
     </div>
 </div>
 
 <script>
-document.getElementById('delete-btn').addEventListener('click', function() {
-    const url = this.getAttribute('data-url');
-    const name = this.getAttribute('data-name');
+    document.getElementById('delete-btn').addEventListener('click', function () {
+        const url = this.getAttribute('data-url');
+        const name = this.getAttribute('data-name');
 
-    Swal.fire({
-        title: 'Supprimer ce candidat ?',
-        text: "Vous allez supprimer définitivement le dossier de " + name + ". Cette action est irréversible !",
-        icon: 'error',
-        showCancelButton: true,
-        confirmButtonColor: '#dc2626',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: 'Oui, supprimer définitivement',
-        cancelButtonText: 'Annuler'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = url;
-        }
+        Swal.fire({
+            title: 'Supprimer ce candidat ?',
+            text: "Vous allez supprimer définitivement le dossier de " + name + ". Cette action est irréversible !",
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Oui, supprimer définitivement',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
     });
-});
 </script>
 {% endblock %}

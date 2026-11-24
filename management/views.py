@@ -12,16 +12,18 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.lib import colors
-from .models import Candidat, Client, Placement, Notification, Expense, ClientRequest
+from .models import Candidat, Client, Placement, Notification, Expense, ClientRequest, PreInscription
 from django.core.mail import send_mail
 from django.conf import settings
-from .forms import CandidatForm, ClientForm, PlacementForm, RegistrationForm, ClientRequestForm
+from .forms import CandidatForm, ClientForm, PlacementForm, RegistrationForm, ClientRequestForm, PreInscriptionForm, SimplifiedPreInscriptionForm
 from datetime import date, datetime, timedelta
 import requests
 import hashlib
 import hmac
 import json
+import uuid
 from django.core.exceptions import PermissionDenied
+from django.views.decorators.csrf import csrf_exempt
 
 def admin_only(view_func):
     def wrapper(request, *args, **kwargs):
@@ -49,29 +51,30 @@ def logout_success_view(request): return render(request, 'management/logout_succ
 def dashboard(request):
     total_revenus = Placement.objects.filter(est_paye=True).aggregate(Sum('commission'))['commission__sum'] or 0
     total_depenses = Expense.objects.aggregate(Sum('montant'))['montant__sum'] or 0
-    postes_stats = Candidat.objects.values('poste_recherche').annotate(total=Count('id'))
+    postes_stats = Candidat.objects.exclude(statut='PAYMENT_PENDING').values('poste_recherche').annotate(total=Count('id'))
     context = {
-        'total_candidats': Candidat.objects.count(),
+        'total_candidats': Candidat.objects.exclude(statut='PAYMENT_PENDING').count(),
         'total_places': Candidat.objects.filter(statut='PLACED').count(),
         'total_dispo': Candidat.objects.filter(statut='AVAILABLE').count(),
         'total_attente': Candidat.objects.filter(statut='WAITING').count(),
         'total_revenus': total_revenus, 'benefice_net': total_revenus - total_depenses,
         'labels_poste': json.dumps([str(dict(Candidat.POSTE_CHOICES).get(p['poste_recherche'])) for p in postes_stats]),
         'data_poste': json.dumps([p['total'] for p in postes_stats]),
-        'recent_candidats': Candidat.objects.order_by('-date_inscription')[:5],
+        'recent_candidats': Candidat.objects.exclude(statut='PAYMENT_PENDING').order_by('-date_inscription')[:5],
         'recent_placements': Placement.objects.select_related('candidat', 'client').order_by('-date_placement')[:5],
     }
     return render(request, 'management/dashboard.html', context)
 
 @login_required
 def statistics(request):
-    stats_poste = Candidat.objects.values('poste_recherche').annotate(total=Count('id'))
-    stats_statut = Candidat.objects.values('statut').annotate(total=Count('id'))
+    candidats_qs = Candidat.objects.exclude(statut='PAYMENT_PENDING')
+    stats_poste = candidats_qs.values('poste_recherche').annotate(total=Count('id'))
+    stats_statut = candidats_qs.values('statut').annotate(total=Count('id'))
     labels_evo, data_evo = [], []
     for i in range(5, -1, -1):
         d = date.today() - timedelta(days=i*30)
         month_label = d.strftime("%b %Y")
-        count = Candidat.objects.filter(date_inscription__month=d.month, date_inscription__year=d.year).count()
+        count = candidats_qs.filter(date_inscription__month=d.month, date_inscription__year=d.year).count()
         labels_evo.append(month_label); data_evo.append(count)
     context = {
         'labels_poste': json.dumps([str(dict(Candidat.POSTE_CHOICES).get(s['poste_recherche'])) for s in stats_poste]),
@@ -105,7 +108,7 @@ def candidats_refuses(request):
 
 @login_required
 def candidat_list(request):
-    candidats = Candidat.objects.exclude(statut='REFUSED')
+    candidats = Candidat.objects.exclude(statut__in=['REFUSED', 'PAYMENT_PENDING'])
     q = request.GET.get('q'); s = request.GET.get('statut'); p = request.GET.get('poste')
     if q: candidats = candidats.filter(Q(nom__icontains=q) | Q(prenom__icontains=q) | Q(telephone__icontains=q))
     if s: candidats = candidats.filter(statut=s)
@@ -159,78 +162,168 @@ def candidat_approve(request, pk):
         Notification.objects.create(titre="Validé", message=f"{c.nom} est maintenant disponible.", type_notif='SUCCESS')
     return redirect('candidat_detail', pk=c.pk)
 
-# --- INSCRIPTION PUBLIQUE & PAIEMENT ---
-def candidat_public_register(request):
-    # On définit form avec une valeur par défaut pour éviter l'erreur UnboundLocalError
-    form = RegistrationForm()
+# --- INSCRIPTION PUBLIQUE & PAIEMENT SÉCURISÉ ---
+def initier_paiement_paytech(request, pre_inscription):
+    """Prépare et envoie la requête de paiement à PayTech sn"""
+    API_KEY = settings.PAYTECH_API_KEY
+    API_SECRET = settings.PAYTECH_API_SECRET
 
+    payload = {
+        "item_name": "Frais de dossier - Dakar Terminus",
+        "item_price": str(pre_inscription.montant),
+        "currency": "XOF",
+        "ref_command": pre_inscription.ref_command,
+        "command_name": f"Inscription {pre_inscription.nom or pre_inscription.telephone} ({pre_inscription.get_poste_recherche_display()})",
+        "env": settings.PAYTECH_ENV,
+        "ipn_url": request.build_absolute_uri('/payment/ipn/'),
+        "success_url": request.build_absolute_uri('/payment/success/'),
+        "cancel_url": request.build_absolute_uri('/payment/cancel/'),
+    }
+
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "API_KEY": API_KEY,
+        "API_SECRET": API_SECRET,
+    }
+
+    try:
+        response = requests.post(
+            "https://paytech.sn/api/payment/request-payment",
+            json=payload,
+            headers=headers,
+            timeout=15
+        )
+        res_data = response.json()
+        if res_data.get('success') == 1:
+            request.session['pending_ref'] = pre_inscription.ref_command
+            return True, res_data['redirect_url']
+        else:
+            return False, f"Erreur PayTech: {res_data}"
+    except Exception as e:
+        return False, f"Erreur de connexion PayTech: {str(e)}"
+
+def candidat_easy_register(request):
+    """
+    Formulaire test spécialement conçu pour les analphabètes et personnes en apprentissage :
+    - Interface ultra-visuelle avec icônes et illustrations par métier
+    - Boutons d'écoute vocale
+    - Prise de photo directe CNI Recto et Verso
+    - Téléphone, Adresse, Tuteur
+    - 100% Mobile First
+    - AUCUNE insertion dans la base de données officielle (Candidat) tant que le paiement n'est pas validé !
+    """
     if request.method == 'POST':
-        form = RegistrationForm(request.POST, request.FILES)
+        form = SimplifiedPreInscriptionForm(request.POST, request.FILES)
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.statut = 'PAYMENT_PENDING'
-            obj.save()
+            pre = form.save(commit=False)
+            pre.ref_command = f"DT-{uuid.uuid4().hex[:8].upper()}-{datetime.now().strftime('%d%H%M')}"
+            pre.statut_paiement = 'PENDING'
+            pre.save()
 
-            # CONFIGURATION PAYTECH (depuis settings.py / .env)
-            API_KEY = settings.PAYTECH_API_KEY
-            API_SECRET = settings.PAYTECH_API_SECRET
+            ok, result = initier_paiement_paytech(request, pre)
+            if ok:
+                return redirect(result)
+            else:
+                messages.error(request, result)
+        else:
+            messages.error(request, "Veuillez vérifier les informations et ajouter les 2 photos de votre carte d'identité.")
+    else:
+        form = SimplifiedPreInscriptionForm()
 
-            payload = {
-                "item_name": "Frais de dossier - Dakar Terminus",
-                "item_price": "5000",
-                "currency": "XOF",
-                "ref_command": f"PAY-{obj.pk}-{datetime.now().strftime('%H%M%S')}",
-                "command_name": f"Paiement Inscription {obj.nom} {obj.prenom}",
-                "env": settings.PAYTECH_ENV,
-                "ipn_url": request.build_absolute_uri('/payment/ipn/'),
-                "success_url": request.build_absolute_uri('/payment/success/'),
-                "cancel_url": request.build_absolute_uri('/payment/cancel/'),
-            }
+    return render(request, 'management/public_register_easy.html', {'form': form})
 
-            headers = {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "API_KEY": API_KEY,
-                "API_SECRET": API_SECRET,
-            }
+def candidat_public_register(request):
+    """
+    Formulaire d'inscription public (redirige vers le nouveau formulaire accessible ou permet l'inscription sécurisée sans polluer la table Candidat)
+    """
+    if request.method == 'POST':
+        form = PreInscriptionForm(request.POST, request.FILES)
+        if form.is_valid():
+            pre = form.save(commit=False)
+            pre.ref_command = f"DT-{uuid.uuid4().hex[:8].upper()}-{datetime.now().strftime('%d%H%M')}"
+            pre.statut_paiement = 'PENDING'
+            pre.save()
 
-            try:
-                response = requests.post(
-                    "https://paytech.sn/api/payment/request-payment",
-                    json=payload,
-                    headers=headers
-                )
-                res_data = response.json()
-                if res_data.get('success') == 1:
-                    return redirect(res_data['redirect_url'])
-                else:
-                    messages.error(request, f"Erreur PayTech: {res_data}")
-                    obj.delete()
-            except Exception as e:
-                messages.error(request, "Erreur de connexion au service de paiement.")
-                obj.delete()
+            ok, result = initier_paiement_paytech(request, pre)
+            if ok:
+                return redirect(result)
+            else:
+                messages.error(request, result)
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+    else:
+        form = PreInscriptionForm()
 
-    # Cette ligne est alignée avec le premier "if"
     return render(request, 'management/public_register.html', {'form': form})
 
+def payment_success(request):
+    """
+    Page de confirmation de paiement.
+    Transfère immédiatement la pré-inscription dans la table Candidat officielle si ce n'est pas déjà fait par l'IPN.
+    """
+    ref = request.GET.get('ref_command') or request.session.get('pending_ref')
+    token = request.GET.get('token')
+    candidat = None
 
+    if ref:
+        pre = PreInscription.objects.filter(ref_command=ref).first()
+        if pre:
+            candidat = pre.transfer_to_candidat(transaction_token=token)
+            Notification.objects.create(
+                titre="Nouvelle Inscription Payée",
+                message=f"{candidat.nom} {candidat.prenom} ({candidat.get_poste_recherche_display()}) a payé ses frais de dossier.",
+                type_notif='SUCCESS'
+            )
+            if 'pending_ref' in request.session:
+                del request.session['pending_ref']
 
-def payment_success(request): return render(request, 'management/public_success.html', {'message': "Votre inscription a été enregistrée avec succès après paiement !"})
+    return render(request, 'management/public_success.html', {
+        'candidat': candidat,
+        'message': "Votre inscription a été enregistrée avec succès après confirmation de votre paiement !"
+    })
 
+def payment_cancel(request):
+    messages.warning(request, "Votre tentative de paiement a été annulée. Votre inscription n'a pas été enregistrée.")
+    return redirect('easy_register')
 
-def payment_cancel(request): messages.warning(request, "Paiement annulé."); return redirect('public_register')
-
-from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def payment_ipn(request):
+    """
+    Webhook IPN de PayTech : notification serveur à serveur.
+    Dès que la transaction est confirmée, la pré-inscription est transférée dans la table Candidat.
+    """
     if request.method == 'POST':
         ref = request.POST.get('ref_command')
-        if ref and ref.startswith('PAY-'):
-            try:
-                c = Candidat.objects.get(pk=ref.split('-')[1])
-                c.frais_paye = True; c.statut = 'WAITING'; c.transaction_id = request.POST.get('token'); c.save()
-                Notification.objects.create(titre="Paiement Reçu", message=f"{c.nom} a payé ses frais.", type_notif='SUCCESS')
-            except: pass
+        token = request.POST.get('token')
+
+        if ref:
+            pre = PreInscription.objects.filter(ref_command=ref).first()
+            if pre and pre.statut_paiement != 'PAID':
+                c = pre.transfer_to_candidat(transaction_token=token)
+                Notification.objects.create(
+                    titre="Paiement Reçu (IPN)",
+                    message=f"Paiement confirmé pour {c.nom} {c.prenom} ({c.get_poste_recherche_display()}).",
+                    type_notif='SUCCESS'
+                )
+
+                try:
+                    send_mail(
+                        'NOUVELLE INSCRIPTION CANDIDAT PAYÉE - DAKAR TERMINUS',
+                        f"Un candidat a validé et payé son inscription :\n\n"
+                        f"Nom : {c.nom} {c.prenom}\n"
+                        f"Poste recherché : {c.get_poste_recherche_display()}\n"
+                        f"Téléphone : {c.telephone}\n"
+                        f"Adresse : {c.adresse}\n"
+                        f"Tuteur : {c.tuteur or 'Non précisé'}\n"
+                        f"Transaction : {token or ref}\n",
+                        settings.DEFAULT_FROM_EMAIL,
+                        [settings.ADMIN_EMAIL],
+                        fail_silently=True,
+                    )
+                except Exception:
+                    pass
+
     return HttpResponse(status=200)
 
 # --- CLIENTS & CRM ---

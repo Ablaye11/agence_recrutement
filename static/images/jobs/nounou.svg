@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <circle cx="50" cy="50" r="48" fill="#ecfdf5"/>
+  <circle cx="48" cy="30" r="14" fill="#f59e0b"/>
+  <!-- Visage femme -->
+  <circle cx="48" cy="30" r="12" fill="#d97706"/>
+  <circle cx="48" cy="31" r="11" fill="#fcd34d"/>
+  <ellipse cx="44" cy="30" rx="1.5" ry="2" fill="#78350f"/>
+  <ellipse cx="52" cy="30" rx="1.5" ry="2" fill="#78350f"/>
+  <path d="M 45 35 Q 48 38 51 35" stroke="#78350f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Foulard/Cheveux -->
+  <path d="M 36 28 C 36 18, 60 18, 60 28 C 60 30, 62 36, 58 37 C 56 34, 40 34, 38 37 Z" fill="#ec4899"/>
+  <!-- Corps / Robe -->
+  <path d="M 32 68 C 32 46, 64 46, 64 68 L 68 90 L 28 90 Z" fill="#10b981"/>
+  <path d="M 38 48 C 42 55, 54 55, 58 48" stroke="#059669" stroke-width="2" fill="none"/>
+  <!-- Bébé dans les bras -->
+  <ellipse cx="60" cy="58" rx="8" ry="11" transform="rotate(-25 60 58)" fill="#fbbf24"/>
+  <!-- Tête bébé -->
+  <circle cx="65" cy="52" r="7" fill="#fde68a"/>
+  <!-- Bonnet bébé -->
+  <path d="M 60 50 C 60 44, 70 44, 70 50 Z" fill="#38bdf8"/>
+  <ellipse cx="64" cy="53" rx="1" ry="1.2" fill="#78350f"/>
+  <ellipse cx="67" cy="53" rx="1" ry="1.2" fill="#78350f"/>
+  <path d="M 64 56 Q 66 58 68 56" stroke="#78350f" stroke-width="1" fill="none"/>
+  <!-- Couverture / emmaillotage bébé -->
+  <path d="M 54 62 C 54 55, 68 55, 68 70 C 62 72, 54 68, 54 62 Z" fill="#bae6fd"/>
+  <!-- Bras femme protégeant le bébé -->
+  <path d="M 34 52 C 38 62, 58 65, 64 64" stroke="#fcd34d" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  <!-- Éléments décoratifs : hochet / cœur -->
+  <path d="M 78 26 C 78 22, 85 22, 85 26 C 85 32, 78 36, 78 36 C 78 36, 71 32, 71 26 C 71 22, 78 22, 78 26 Z" fill="#f43f5e"/>
+  <circle cx="22" cy="38" r="4" fill="#38bdf8"/>
+  <circle cx="20" cy="36" r="1.5" fill="#fff"/>
+</svg>

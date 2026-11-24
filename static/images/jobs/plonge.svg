@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <circle cx="50" cy="50" r="48" fill="#e0f2fe"/>
+  <!-- Évier / Bac de plonge -->
+  <rect x="16" y="58" width="68" height="32" rx="6" fill="#64748b"/>
+  <!-- Eau moussante -->
+  <rect x="22" y="64" width="56" height="18" rx="4" fill="#38bdf8" opacity="0.8"/>
+  <!-- Bulles de savon -->
+  <circle cx="34" cy="62" r="4" fill="#ffffff" stroke="#bae6fd" stroke-width="1.5"/>
+  <circle cx="44" cy="58" r="5" fill="#ffffff" stroke="#bae6fd" stroke-width="1.5"/>
+  <circle cx="54" cy="62" r="3.5" fill="#ffffff" stroke="#bae6fd" stroke-width="1.5"/>
+  <circle cx="64" cy="58" r="4.5" fill="#ffffff" stroke="#bae6fd" stroke-width="1.5"/>
+  <!-- Assiette brillante tenue -->
+  <circle cx="50" cy="46" r="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <circle cx="50" cy="46" r="9" fill="#f8fafc"/>
+  <!-- Étincelle sur l'assiette propre -->
+  <path d="M 56 36 L 58 40 L 62 42 L 58 44 L 56 48 L 54 44 L 50 42 L 54 40 Z" fill="#f59e0b"/>
+  <!-- Robinet chromé au-dessus -->
+  <path d="M 50 16 L 50 26 C 50 32, 42 32, 42 36 L 42 38" stroke="#94a3b8" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Filet d'eau -->
+  <line x1="42" y1="38" x2="42" y2="44" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="2,2"/>
+</svg>

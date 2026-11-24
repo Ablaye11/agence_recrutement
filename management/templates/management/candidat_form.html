@@ -10,7 +10,7 @@
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
             {% for field in form %}
-            <div class="form-group {% if field.name == 'experience' or field.name == 'observations' or field.name == 'adresse' %}full-width{% endif %}">
+            <div class="form-group {% if field.name == 'experience' or field.name == 'observations' or field.name == 'adresse' or field.name == 'tuteur' or field.name == 'commentaire' %}full-width{% endif %}">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
                 {% if field.errors %}

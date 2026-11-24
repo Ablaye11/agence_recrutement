@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <circle cx="50" cy="50" r="48" fill="#fff7ed"/>
+  <!-- Moto / Scooter -->
+  <circle cx="26" cy="74" r="10" fill="#1e293b"/>
+  <circle cx="26" cy="74" r="5" fill="#cbd5e1"/>
+  <circle cx="74" cy="74" r="10" fill="#1e293b"/>
+  <circle cx="74" cy="74" r="5" fill="#cbd5e1"/>
+  <!-- Cadre et carénage moto -->
+  <path d="M 26 74 L 42 66 L 56 66 L 68 50 L 74 74" stroke="#ea580c" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Boîte de livraison à l'arrière -->
+  <rect x="18" y="44" width="18" height="18" rx="3" fill="#f97316"/>
+  <path d="M 23 53 L 31 53" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <!-- Livreur avec casque de moto -->
+  <circle cx="54" cy="32" r="10" fill="#ea580c"/>
+  <path d="M 52 30 L 62 30 L 60 36 L 52 36 Z" fill="#1e293b"/>
+  <!-- Corps du livreur -->
+  <path d="M 46 42 L 56 42 L 58 60 L 44 60 Z" fill="#c2410c"/>
+  <!-- Guidon -->
+  <path d="M 64 46 L 70 48" stroke="#0f172a" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Ligne de vitesse / route -->
+  <line x1="8" y1="86" x2="92" y2="86" stroke="#fdba74" stroke-width="3" stroke-linecap="round"/>
+</svg>

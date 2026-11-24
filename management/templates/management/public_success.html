@@ -1,30 +1,132 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription Réussie - DAKAR TERMINUS</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Paiement & Inscription Réussis - DAKAR TERMINUS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
-        body { background: #f8fafc; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .success-card { text-align: center; max-width: 500px; padding: 40px; background: #fff; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .icon { font-size: 60px; color: #10b981; margin-bottom: 20px; }
+        body {
+            background: #f0fdf4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .success-card {
+            text-align: center;
+            max-width: 520px;
+            width: 100%;
+            padding: 35px 24px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -10px rgba(16, 185, 129, 0.2);
+            border: 2px solid #86efac;
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #dcfce7;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: 900;
+            margin: 0 auto 20px;
+        }
+
+        h1 {
+            color: #065f46;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .info-pill {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 12px;
+            padding: 14px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background: #25d366;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-top: 15px;
+            box-shadow: 0 8px 16px rgba(37, 211, 102, 0.25);
+            box-sizing: border-box;
+        }
+
+        .btn-home {
+            display: inline-block;
+            margin-top: 15px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
+
 <body>
     <div class="success-card">
-        <div class="icon">✓</div>
-        <h1 style="color: #1e293b; margin-bottom: 10px;">Inscription Réussie !</h1>
-        <p style="color: #64748b; line-height: 1.6;">
-        {% if message %}
-            {{ message }}
-        {% else %}
-        Merci pour votre inscription. Votre dossier a été transmis à nos services. Nous vous contacterons très prochainement pour un entretien.
-        {% endif %}
-    </p>
+        <div class="icon-circle">✓</div>
+        <h1>Paiement & Inscription Réussis !</h1>
 
-        <a href="{% url 'public_register' %}" style="display: inline-block; margin-top: 30px; color: #2563eb; text-decoration: none; font-weight: 600;">Retour à l'accueil</a>
+        <p style="color: #047857; font-size: 1rem; line-height: 1.5; font-weight: 500;">
+            {{ message|default:"Votre paiement de 5 000 FCFA a été vérifié et accepté avec succès." }}
+        </p>
+
+        {% if candidat %}
+        <div class="info-pill">
+            <div
+                style="font-size: 0.82rem; color: #059669; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">
+                Dossier Enregistré</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: #065f46;">{{ candidat.nom }} {{ candidat.prenom }}
+            </div>
+            <div style="font-size: 0.95rem; color: #334155; margin-top: 4px;">Poste : <strong>{{
+                    candidat.get_poste_recherche_display }}</strong></div>
+            <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">Matricule : <strong>{{ candidat.matricule
+                    }}</strong></div>
+        </div>
+        {% endif %}
+
+        <p style="color: #475569; font-size: 0.9rem; margin-top: 15px; line-height: 1.5;">
+            L'équipe de <strong>Dakar Terminus</strong> a bien reçu vos documents et vous contactera rapidement par
+            téléphone pour vous proposer des missions.
+        </p>
+
+        <a href="https://wa.me/221770000000?text=Bonjour,%20je%20viens%20de%20m'inscrire%20sur%20Dakar%20Terminus"
+            target="_blank" class="btn-whatsapp">
+            <span>💬</span> Contacter l'agence sur WhatsApp
+        </a>
+
+        <div>
+            <a href="{% url 'easy_register' %}" class="btn-home">Effectuer une autre inscription</a>
+        </div>
     </div>
 </body>
+
 </html>

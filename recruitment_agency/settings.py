@@ -60,7 +60,19 @@ SECRET_KEY = config('SECRET_KEY', default='rudd6c&0-77-ycs)+uqc=(+)s0ci!#))wwogr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['dakarterminus.com', 'www.dakarterminus.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['dakarterminus.com', 'www.dakarterminus.com', '.dakarterminus.com', 'localhost', '127.0.0.1', '192.168.30.108', '*']
+
+# Sécurité & Domaines de confiance (Indispensable en production pour HTTPS et soumissions de formulaires)
+CSRF_TRUSTED_ORIGINS = [
+    'https://dakarterminus.com',
+    'https://www.dakarterminus.com',
+    'http://dakarterminus.com',
+    'http://www.dakarterminus.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -193,5 +205,13 @@ ADMIN_EMAIL = config('ADMIN_EMAIL', default='suturasac@gmail.com')
 # PayTech Configuration
 PAYTECH_API_KEY = config('PAYTECH_API_KEY', default='')
 PAYTECH_API_SECRET = config('PAYTECH_API_SECRET', default='')
-PAYTECH_ENV = config('PAYTECH_ENV', default='test')
+PAYTECH_ENV = config('PAYTECH_ENV', default='prod')
+
+# Sécurité en Production
+if not DEBUG and not any('127.0.0.1' in host or 'localhost' in host for host in ALLOWED_HOSTS if host == '127.0.0.1'):
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
 

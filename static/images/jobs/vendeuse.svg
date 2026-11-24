@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <circle cx="50" cy="50" r="48" fill="#fdf4ff"/>
+  <!-- Tête vendeuse -->
+  <circle cx="50" cy="28" r="11" fill="#fcd34d"/>
+  <ellipse cx="46" cy="27" rx="1.5" ry="1.8" fill="#78350f"/>
+  <ellipse cx="54" cy="27" rx="1.5" ry="1.8" fill="#78350f"/>
+  <path d="M 47 32 Q 50 35 53 32" stroke="#78350f" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Coiffure élégante -->
+  <path d="M 38 24 C 38 14, 62 14, 62 24 C 64 30, 58 35, 50 36 C 42 35, 36 30, 38 24 Z" fill="#9333ea"/>
+  <!-- Tenue vendeuse / chemisier -->
+  <path d="M 34 68 C 34 45, 66 45, 66 68 L 68 90 L 32 90 Z" fill="#a855f7"/>
+  <!-- Sac de shopping / boutique -->
+  <rect x="62" y="54" width="22" height="26" rx="4" fill="#ec4899"/>
+  <!-- Anses du sac -->
+  <path d="M 69 54 C 69 46, 77 46, 77 54" stroke="#db2777" stroke-width="2.5" fill="none"/>
+  <!-- Logo sur sac -->
+  <circle cx="73" cy="67" r="4" fill="#ffffff" opacity="0.8"/>
+  <!-- Caisse enregistreuse / ticket -->
+  <rect x="16" y="62" width="24" height="20" rx="3" fill="#64748b"/>
+  <rect x="20" y="66" width="16" height="6" rx="1" fill="#22c55e"/>
+  <!-- Ticket de caisse -->
+  <path d="M 28 62 L 28 54 L 34 54 L 34 62" fill="#ffffff"/>
+</svg>
