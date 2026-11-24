@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DAKAR TERMINUS{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.1">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.3">
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <meta name="theme-color" content="#2563eb">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,21 +17,29 @@
 <body hx-boost="true" hx-indicator=".htmx-progress">
     <div class="htmx-progress"></div>
     {% if user.is_authenticated %}
-    <!-- Bouton Mobile -->
-    <div class="mobile-header" style="display: none; background: #1e293b; color: white; padding: 1rem; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000;">
-        <div style="font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px;">{{ user.username }}</div>
-        <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-top: 4px;">
+    <!-- Barre Mobile Haute -->
+    <div class="mobile-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 800; font-size: 1.05rem; letter-spacing: -0.5px; color: #fff;">DAKAR TERMINUS</span>
             {% if user.is_superuser %}
-            <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 10px;">🛡️ Administrateur</span>
+            <span style="background: #10b981; color: white; padding: 2px 7px; border-radius: 6px; font-size: 0.65rem; font-weight: 700;">Admin</span>
             {% else %}
-            <span style="background: #64748b; color: white; padding: 2px 8px; border-radius: 10px;">👥 Assistant</span>
+            <span style="background: #64748b; color: white; padding: 2px 7px; border-radius: 6px; font-size: 0.65rem; font-weight: 700;">Assistant</span>
             {% endif %}
         </div>
-        <button id="menu-toggle" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">☰</button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button id="menu-toggle" aria-label="Menu" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 1.3rem; padding: 5px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">☰</button>
+        </div>
     </div>
 
+    <!-- Backdrop pour fermer la sidebar en cliquant en dehors -->
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-logo">DAKAR TERMINUS</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div class="sidebar-logo" style="margin-bottom: 0;">DAKAR TERMINUS</div>
+            <button id="sidebar-close" style="display: none; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 1.1rem; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; align-items: center; justify-content: center;">✕</button>
+        </div>
         <div style="padding: 0 1.5rem 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
             <div style="font-weight: 700; color: white;">{{ user.username }}</div>
             <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px;">
@@ -204,21 +212,31 @@
     </script>
     {% block extra_js %}{% endblock %}
     <script>
-        // Toggle Sidebar Mobile
+        // Gestion Sidebar Mobile & Backdrop
         const menuToggle = document.getElementById('menu-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
         const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
 
-        if (menuToggle) {
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-            });
+        function openSidebar() {
+            if (sidebar) sidebar.classList.add('active');
+            if (backdrop) backdrop.classList.add('active');
         }
+
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('active');
+            if (backdrop) backdrop.classList.remove('active');
+        }
+
+        if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+        if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+        if (backdrop) backdrop.addEventListener('click', closeSidebar);
 
         // Fermer le menu si on clique sur un lien (sur mobile)
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 1024) {
-                    sidebar.classList.remove('active');
+                    closeSidebar();
                 }
             });
         });
